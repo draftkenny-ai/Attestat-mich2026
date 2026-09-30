@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Панель руководителя — Аттестация МиЧ КМ</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#f0f2f5;color:#1a1a1a;padding:20px}
+  .container{max-width:1200px;margin:0 auto}
+  h1{font-size:24px;margin-bottom:6px}
+  .sub{color:#666;font-size:13.5px;margin-bottom:24px}
+  .lock-screen{background:#fff;padding:40px 32px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.08);max-width:400px;margin:60px auto;text-align:center}
+  .lock-screen h2{font-size:20px;margin-bottom:8px}
+  .lock-screen p{color:#666;font-size:13.5px;margin-bottom:22px}
+  .lock-screen input{width:100%;padding:14px 16px;font-size:16px;border:2px solid #d0d7de;border-radius:10px;outline:none;text-align:center;transition:border .15s}
+  .lock-screen input:focus{border-color:#4a90d9}
+  .lock-screen button{width:100%;padding:14px;margin-top:14px;font-size:15px;font-weight:700;background:#4a90d9;color:#fff;border:none;border-radius:10px;cursor:pointer}
+  .lock-screen button:hover{background:#357abd}
+  .lock-error{color:#d9534f;font-size:13px;margin-top:10px;height:16px}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .tab{padding:10px 20px;background:#fff;border:2px solid #d0d7de;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;color:#333;transition:.15s}
+  .tab:hover{border-color:#4a90d9}
+  .tab.active{background:#4a90d9;border-color:#4a90d9;color:#fff}
+  .panel{display:none}
+  .panel.active{display:block}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px}
+  .stat{background:#fff;padding:20px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .stat-label{font-size:12px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600}
+  .stat-value{font-size:28px;font-weight:800;color:#4a90d9}
+  .filters{background:#fff;padding:16px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .filters label{font-size:13px;color:#666;font-weight:600}
+  .filters input,.filters select{padding:9px 12px;border:2px solid #d0d7de;border-radius:8px;font-size:14px;outline:none}
+  .filters input:focus,.filters select:focus{border-color:#4a90d9}
+  .filters button{padding:10px 20px;font-size:14px;font-weight:600;background:#4a90d9;color:#fff;border:none;border-radius:8px;cursor:pointer}
+  .filters button:hover{background:#357abd}
+  table{width:100%;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);border-collapse:collapse}
+  th{background:#4a90d9;color:#fff;padding:12px 14px;text-align:left;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  td{padding:12px 14px;border-bottom:1px solid #eee;font-size:14px}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:#f8fafc}
+  .grade{display:inline-block;min-width:32px;text-align:center;padding:4px 10px;border-radius:8px;font-weight:700;color:#fff;font-size:13px}
+  .grade-5{background:#28a745}.grade-4{background:#5cb85c}.grade-3{background:#f0ad4e}.grade-2{background:#d9534f}
+  .settings-card{background:#fff;padding:24px;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.08);max-width:600px}
+  .settings-card h3{font-size:17px;margin-bottom:6px}
+  .settings-card .note{font-size:13px;color:#666;margin-bottom:18px;line-height:1.5}
+  .setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #eee}
+  .setting-row:last-child{border-bottom:none}
+  .setting-row label{font-size:14px;font-weight:600}
+  .setting-row input{width:90px;padding:9px 12px;border:2px solid #d0d7de;border-radius:8px;font-size:15px;text-align:center;outline:none}
+  .setting-row input:focus{border-color:#4a90d9}
+  .setting-row button{padding:9px 16px;background:#28a745;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-left:10px}
+  .setting-row button:hover{background:#218838}
+  .toast{position:fixed;top:20px;right:20px;background:#28a745;color:#fff;padding:14px 22px;border-radius:10px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;transition:opacity .2s;pointer-events:none;z-index:100}
+  .toast.show{opacity:1}
+  .empty{text-align:center;padding:40px;color:#888}
+  @media (max-width:600px){th,td{padding:8px 6px;font-size:12px}.filters{flex-direction:column;align-items:stretch}.filters input,.filters select,.filters button{width:100%}}
+</style>
+</head>
+<body>
+
+<div id="lockScreen" class="lock-screen">
+  <h2>🔐 Панель руководителя</h2>
+  <p>Введите пароль руководителя</p>
+  <input type="password" id="pwdInput" placeholder="Пароль" onkeydown="if(event.key==='Enter')unlock()">
+  <button onclick="unlock()">Войти</button>
+  <div class="lock-error" id="lockError"></div>
+</div>
+
+<div id="panel" class="container" style="display:none">
+  <h1>Панель руководителя</h1>
+  <div class="sub">Аттестация МиЧ КМ · Gask Bro Group</div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('results', this)">📊 Результаты</button>
+    <button class="tab" onclick="showTab('settings', this)">⏱ Настройки таймера</button>
+  </div>
+
+  <div id="tab-results" class="panel active">
+    <div class="stats" id="stats"></div>
+
+    <div class="filters">
+      <label>Тест:</label>
+      <select id="filterTest" onchange="renderTable()">
+        <option value="">Все тесты</option>
+        <option value="Тест №1">Бармен · Метод и посуда</option>
+        <option value="Тест №2">Бармен · Ингредиенты</option>
+        <option value="Тест №3">Бармен · Измерения</option>
+        <option value="Тест по сервису">Сервис</option>
+      </select>
+      <label>Оценка:</label>
+      <select id="filterGrade" onchange="renderTable()">
+        <option value="">Все</option>
+        <option value="5">Только 5</option>
+        <option value="4">Только 4</option>
+        <option value="3">Только 3</option>
+        <option value="2">Только 2</option>
+      </select>
+      <label>Поиск по ФИО:</label>
+      <input type="text" id="filterName" placeholder="Иванов..." oninput="renderTable()">
+      <button onclick="loadResults()">🔄 Обновить</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Дата</th><th>ФИО</th><th>Тест</th><th>Баллы</th><th>%</th><th>Оценка</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody">
+        <tr><td colspan="6" class="empty">Загрузка...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="tab-settings" class="panel">
+    <div class="settings-card">
+      <h3>⏱ Время на прохождение тестов</h3>
+      <p class="note">Укажите, сколько минут даётся на каждый тест. Изменения применяются сразу — обновите страницу теста, чтобы применить новое значение.</p>
+      <div id="settingsList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const WEB_APP_URL = 'ВСТАВЬТЕ_URL_ВЕБ-ПРИЛОЖЕНИЯ';
+let allResults = [];
+
+// Пароль отключён
+showPanel();
+
+function showPanel() {
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('panel').style.display = 'block';
+  loadResults();
+  loadSettings();
+}
+
+function showTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function loadResults() {
+  document.getElementById('resultsBody').innerHTML = '<tr><td colspan="6" class="empty">Загрузка...</td></tr>';
+  jsonp(WEB_APP_URL + '?action=getResults&pwd=mich_mgr_2026', (data) => {
+    if (!data || data.error) {
+      document.getElementById('resultsBody').innerHTML = '<tr><td colspan="6" class="empty">Ошибка загрузки</td></tr>';
+      return;
+    }
+    allResults = (data.results || []).reverse();
+    renderStats();
+    renderTable();
+  });
+}
+
+function renderStats() {
+  const total = allResults.length;
+  const avg = total ? (allResults.reduce((s, r) => s + (parseInt(r.pct) || 0), 0) / total).toFixed(1) : '—';
+  const grade5 = allResults.filter(r => String(r.grade) === '5').length;
+  const grade2 = allResults.filter(r => String(r.grade) === '2').length;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="stat-label">Всего прохождений</div><div class="stat-value">${total}</div></div>
+    <div class="stat"><div class="stat-label">Средний результат</div><div class="stat-value">${avg}%</div></div>
+    <div class="stat"><div class="stat-label">Отлично (5)</div><div class="stat-value" style="color:#28a745">${grade5}</div></div>
+    <div class="stat"><div class="stat-label">Не сдали (2)</div><div class="stat-value" style="color:#d9534f">${grade2}</div></div>
+  `;
+}
+
+function renderTable() {
+  const fTest = document.getElementById('filterTest').value;
+  const fGrade = document.getElementById('filterGrade').value;
+  const fName = document.getElementById('filterName').value.toLowerCase();
+  let rows = allResults.filter(r => {
+    if (fTest && r.test !== fTest) return false;
+    if (fGrade && String(r.grade) !== fGrade) return false;
+    if (fName && !String(r.name).toLowerCase().includes(fName)) return false;
+    return true;
+  });
+  if (!rows.length) {
+    document.getElementById('resultsBody').innerHTML = '<tr><td colspan="6" class="empty">Нет данных</td></tr>';
+    return;
+  }
+  document.getElementById('resultsBody').innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.date}</td><td>${r.name}</td><td>${r.test}</td>
+      <td>${r.score}</td><td>${r.pct}</td>
+      <td><span class="grade grade-${r.grade}">${r.grade}</span></td>
+    </tr>`).join('');
+}
+
+function loadSettings() {
+  const list = document.getElementById('settingsList');
+  list.innerHTML = 'Загрузка...';
+  jsonp(WEB_APP_URL + '?action=getSettings', (data) => {
+    if (!data || !data.settings) { list.innerHTML = 'Ошибка загрузки'; return; }
+    const names = {
+      'test1.html': 'Тест №1 · Бармен — Метод и посуда',
+      'test2.html': 'Тест №2 · Бармен — Ингредиенты',
+      'test3.html': 'Тест №3 · Бармен — Измерения',
+      'service.html': 'Тест · Сервис'
+    };
+    let html = '';
+    Object.keys(names).forEach(key => {
+      const min = data.settings[key] || 15;
+      html += `
+        <div class="setting-row">
+          <label>${names[key]}</label>
+          <div>
+            <input type="number" id="set_${key}" value="${min}" min="1" max="180">
+            <button onclick="saveSetting('${key}')">Сохранить</button>
+          </div>
+        </div>`;
+    });
+    list.innerHTML = html;
+  });
+}
+
+function saveSetting(test) {
+  const min = parseInt(document.getElementById('set_' + test).value) || 15;
+  jsonp(WEB_APP_URL + '?action=setSettings&pwd=mich_mgr_2026&test=' + encodeURIComponent(test) + '&minutes=' + min, (data) => {
+    if (data && data.status === 'ok') showToast('✅ Сохранено: ' + min + ' мин');
+    else showToast('❌ Ошибка сохранения');
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function jsonp(url, callback) {
+  const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  window[cbName] = (data) => {
+    callback(data);
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+  };
+  const script = document.createElement('script');
+  script.src = url + '&callback=' + cbName;
+  script.onerror = () => callback(null);
+  document.body.appendChild(script);
+  setTimeout(() => { if (window[cbName]) { callback(null); delete window[cbName]; } }, 8000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Аттестация МиЧ КМ (Бармен) — Тест №2</title>
+<style>
+  *{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;max-width:920px;margin:0 auto;padding:20px;background:#f0f2f5;color:#1a1a1a}
+  h1{text-align:center;font-size:22px;margin:10px 0 4px}.test-label{text-align:center;font-size:16px;font-weight:700;color:#4a90d9;margin-bottom:6px}.subtitle{text-align:center;color:#666;font-size:13px;margin-bottom:20px}
+  .name-block{background:#fff;padding:20px;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:18px}
+  .name-block label{display:block;font-weight:600;font-size:15px;margin-bottom:8px}
+  .name-block input{width:100%;padding:12px 14px;font-size:15px;border:2px solid #d0d7de;border-radius:8px;outline:none}
+  .name-block input:focus{border-color:#4a90d9}
+  .name-block .hint{font-size:12px;color:#888;margin-top:6px}
+  .name-block .start-btn{display:block;width:100%;padding:14px;margin-top:14px;font-size:15px;font-weight:700;background:#28a745;color:#fff;border:none;border-radius:10px;cursor:pointer;transition:.15s}
+  .name-block .start-btn:hover{background:#218838}
+  .progress{text-align:center;font-size:14px;color:#555;margin-bottom:16px;font-weight:600}
+  .question{background:#fff;padding:16px 20px;margin-bottom:12px;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .question h3{margin:0 0 10px;font-size:15px;font-weight:600;line-height:1.4}
+  .option{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;margin:4px 0;border-radius:8px;cursor:pointer;font-size:14px;line-height:1.35;transition:background .12s}
+  .option:hover{background:#eef4fb}.option input{margin-top:3px;flex-shrink:0}
+  .option.locked{cursor:default}.option.locked:hover{background:transparent}
+  .option.correct{background:#d4edda}.option.wrong{background:#f8d7da}
+  .option.correct.locked:hover{background:#d4edda}.option.wrong.locked:hover{background:#f8d7da}
+  .btn{display:block;margin:24px auto 8px;padding:15px 44px;font-size:17px;font-weight:700;background:#4a90d9;color:#fff;border:none;border-radius:10px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#357abd}.btn.secondary{background:#6c757d;font-size:14px;padding:10px 24px}.btn.secondary:hover{background:#565e64}
+  .result{text-align:center;font-size:19px;font-weight:700;margin:16px 0 30px;padding:20px;border-radius:10px}
+  .result.pass{background:#d4edda;color:#155724}.result.fail{background:#f8d7da;color:#721c24}
+  .result small{display:block;font-size:13px;font-weight:400;margin-top:6px;opacity:.85}
+  .note{background:#fff8e1;border-left:4px solid #ffc107;padding:12px 16px;border-radius:8px;font-size:13px;color:#5c4a00;margin-bottom:18px;line-height:1.5}
+  .warning{background:#fff3cd;border:1px solid #ffc107;color:#664d03;padding:10px 14px;border-radius:8px;font-size:14px;margin-bottom:12px;display:none;text-align:center}
+  .warning.show{display:block}
+  #timerBox{position:fixed;top:14px;right:14px;background:#4a90d9;color:#fff;padding:10px 18px;border-radius:12px;font-weight:700;font-size:17px;box-shadow:0 4px 14px rgba(0,0,0,.2);z-index:50;display:none;font-variant-numeric:tabular-nums}
+  #timerBox.warn{background:#f0ad4e}
+  #timerBox.danger{background:#d9534f;animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
+  @media (max-width:600px){body{padding:12px}.question{padding:12px 14px}#timerBox{top:8px;right:8px;padding:8px 14px;font-size:15px}}
+</style>
+</head>
+<body>
+
+<div id="timerBox">⏱ <span id="timerText">15:00</span></div>
+
+<h1>Аттестация МиЧ КМ (Бармен)</h1>
+<div class="test-label">Тест №2</div>
+<div class="subtitle">Ингредиенты · 50 вопросов</div>
+
+<div class="note">
+  <b>Инструкция:</b> укажите ФИО и нажмите «Начать тест». Отметьте один ответ в каждом вопросе и нажмите «Сдать тест».
+  Когда время истечёт — тест сдастся автоматически. Оценка: 90–100% — «5», 75–89% — «4», 60–74% — «3», менее 60% — «2».
+</div>
+
+<div class="name-block" id="nameBlock">
+  <label for="userName">ФИО сотрудника <span style="color:#d9534f">*</span></label>
+  <input type="text" id="userName" placeholder="Иванов Иван Иванович" autocomplete="off">
+  <div class="hint">Укажите полное имя — оно будет указано в отчёте.</div>
+  <button class="start-btn" onclick="startTest()">▶ Начать тест</button>
+</div>
+
+<div class="progress" id="progress" style="display:none">Отвечено: 0 из 50</div>
+<div class="warning" id="warning"></div>
+<div id="testBox"></div>
+<div id="result" class="result" style="display:none"></div>
+
+<script>
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxFxRX6ohQrDWxSJezONoX9q_Id09GOpCan_x6UtLQoix1terh0pVmYKn4_ecroHV0Q/exec';
+const TEST_NAME = 'Тест №2';
+const TEST_FILE = 'test2.html';
+
+const Q = [
+{v:2,q:"Какой аперитив входит в коктейль «Апероль спритц»?",o:["Апероль","Кампари","Чинзано","Мартини","Селано"],a:0},
+{v:2,q:"Какой крепкий алкоголь входит в коктейль «Ахтерштевень»?",o:["Абсент","Текила","Джин","Ром","Виски"],a:0},
+{v:2,q:"Какой алкоголь входит в коктейль «Margarita»?",o:["Текила","Джин","Ром","Бурбон","Водка"],a:0},
+{v:2,q:"Какой алкоголь входит в коктейль «Белый русский»?",o:["Водка","Джин","Ром","Текила","Виски"],a:0},
+{v:2,q:"Какой алкоголь входит в коктейль «Малиновый физ»?",o:["Джин","Водка","Ром","Текила","Виски"],a:0},
+{v:2,q:"Какой алкоголь входит в коктейль «Авиация»?",o:["Джин","Водка","Ром","Текила","Виски"],a:0},
+{v:2,q:"Какой кордиал является основой коктейля «Секс on the city»?",o:["Кордиал Маракуйя","Кордиал Клубника","Кордиал Гренадин","Кордиал Миндаль","Кордиал Персик"],a:0},
+{v:2,q:"Какой алкоголь входит в коктейль «Шальной круиз»?",o:["Текила","Водка","Джин","Ром","Виски"],a:0},
+{v:2,q:"Какой алкоголь входит в коктейль «1001 ночь»?",o:["Джин","Водка","Ром","Текила","Виски"],a:0},
+{v:2,q:"Какой алкоголь входит в коктейль «Черри Черри Леди»?",o:["Бурбон","Джин","Ром","Текила","Водка"],a:0},
+{v:2,q:"Какой алкоголь входит в коктейль «Грушевый кайфун»?",o:["Бурбон","Джин","Ром","Текила","Водка"],a:0},
+{v:2,q:"Какой алкоголь входит в коктейль «Оранж Марго»?",o:["Текила","Джин","Ром","Бурбон","Водка"],a:0},
+{v:2,q:"Какой алкоголь входит в коктейль «Хопс Палома»?",o:["Текила","Джин","Ром","Бурбон","Водка"],a:0},
+{v:2,q:"Какой ликер входит в коктейль «Полундра XL»?",o:["Ликер персик","Ликер кофе","Ликер мараскино","Ликер фиалка","Ликер трипл сек"],a:0},
+{v:2,q:"Какой аперитив входит в коктейль «За деньги Да»?",o:["Апероль","Кампари","Чинзано","Мартини","Селано"],a:0},
+{v:2,q:"Какой алкоголь входит в коктейль «Царица»?",o:["Джин","Водка","Ром","Текила","Виски"],a:0},
+{v:2,q:"Какой алкоголь входит в коктейль «Эпл Сиритц»?",o:["Джин","Водка","Ром","Текила","Виски"],a:0},
+{v:2,q:"Какое вино входит в коктейль «Апероль спритц»?",o:["Игристое вино","Красное вино","Белое сухое","Розовое вино","Портвейн"],a:0},
+{v:2,q:"Какой сироп входит в коктейль «Ахтерштевень»?",o:["Сироп клубника","Сироп маракуйя","Сироп гренадин","Сироп миндаль","Сироп кокос"],a:0},
+{v:2,q:"Какой ликер входит в коктейль «Margarita»?",o:["Ликер трипл сек","Ликер кофе","Ликер мараскино","Ликер фиалка","Ликер персик"],a:0},
+{v:2,q:"Какие сливки входят в коктейль «Белый русский»?",o:["Сливки 11%","Сливки 20%","Сливки 33%","Сливки растительные","Молоко"],a:0},
+{v:2,q:"Какое пюре входит в коктейль «Малиновый физ»?",o:["Пюре малина","Пюре клубника","Пюре манго","Пюре маракуйя","Пюре ананас"],a:0},
+{v:2,q:"Какой ликер входит в коктейль «Авиация»?",o:["Ликер фиалка","Ликер кофе","Ликер трипл сек","Ликер мараскино","Ликер персик"],a:0},
+{v:2,q:"Какое вино входит в коктейль «Секс on the city»?",o:["Игристое вино","Красное вино","Белое сухое","Розовое вино","Портвейн"],a:0},
+{v:2,q:"Какой сироп входит в коктейль «Шальной круиз»?",o:["Сироп гренадин","Сироп маракуйя","Сироп клубника","Сироп миндаль","Сироп кокос"],a:0},
+{v:2,q:"Какой ликер входит в коктейль «1001 ночь»?",o:["Ликер Личи","Ликер кофе","Ликер мараскино","Ликер фиалка","Ликер трипл сек"],a:0},
+{v:2,q:"Какой ликер входит в коктейль «Черри Черри Леди»?",o:["Ликер Ред окраса","Ликер кофе","Ликер мараскино","Ликер фиалка","Ликер трипл сек"],a:0},
+{v:2,q:"Какой ликер входит в коктейль «Грушевый кайфун»?",o:["Файербол","Ликер кофе","Ликер мараскино","Ликер фиалка","Ликер трипл сек"],a:0},
+{v:2,q:"Какой ликер входит в коктейль «Оранж Марго»?",o:["Ликер грейпфрут","Ликер кофе","Ликер мараскино","Ликер фиалка","Ликер трипл сек"],a:0},
+{v:2,q:"Какой напиток входит в коктейль «Хопс Палома»?",o:["Тоник","Содовая","Кола","Спрайт","Вода"],a:0},
+{v:2,q:"Какой сок входит в коктейль «Полундра XL»?",o:["Сок ананас","Сок грейпфрут","Сок яблоко","Сок апельсин","Сок маракуйя"],a:0},
+{v:2,q:"Какое пюре входит в коктейль «За деньги Да»?",o:["Пюре малина","Пюре манго","Пюре маракуйя","Пюре клубника","Пюре ананас"],a:0},
+{v:2,q:"Какое пюре входит в коктейль «Царица»?",o:["Пюре маракуйя","Пюре малина","Пюре манго","Пюре клубника","Пюре ананас"],a:0},
+{v:2,q:"Какой вермут входит в коктейль «Эпл Сиритц»?",o:["Вермут экстра драй","Кампари","Апероль","Чинзано","Селано"],a:0},
+{v:2,q:"Что придаёт текстуру коктейлю «Секс on the city»?",o:["Яичный белок","Сливки","Молоко","Вода","Сироп"],a:0},
+{v:2,q:"Что помимо абсента и сиропа входит в коктейль «Ахтерштевень»?",o:["Смесь кислот","Сок лимона","Сок лайма","Уксус","Вино"],a:0},
+{v:2,q:"Какой сироп входит в коктейль «Margarita»?",o:["Сироп лайм","Сироп маракуйя","Сироп клубника","Сироп миндаль","Сироп кокос"],a:0},
+{v:2,q:"Какой сироп помимо пюре входит в коктейль «Малиновый физ»?",o:["Сироп маракуйя","Сироп клубника","Сироп гренадин","Сироп миндаль","Сироп кокос"],a:0},
+{v:2,q:"Какой напиток добавляет газированность в «Малиновый физ»?",o:["Вода газированная","Тоник","Кола","Спрайт","Содовая"],a:0},
+{v:2,q:"Какой ликер помимо водки и сливок входит в «Белый русский»?",o:["Ликер кофе","Ликер трипл сек","Ликер мараскино","Ликер фиалка","Ликер персик"],a:0},
+{v:2,q:"Что придаёт текстуру коктейлю «Черри Черри Леди»?",o:["Яичный белок","Сливки","Молоко","Вода","Сироп"],a:0},
+{v:2,q:"Какая кислота входит в коктейль «Черри Черри Леди»?",o:["Мис Кислот","Сок лимона","Сок лайма","Уксус","Вино"],a:0},
+{v:2,q:"Какой вермут входит в коктейль «Грушевый кайфун»?",o:["Вермут Мартини Россо","Кампари","Апероль","Чинзано","Селано"],a:0},
+{v:2,q:"Что придаёт текстуру коктейлю «Грушевый кайфун»?",o:["Яичный белок","Сливки","Молоко","Вода","Сироп"],a:0},
+{v:2,q:"Какой сок входит в коктейль «Оранж Марго»?",o:["Блад Оранж","Сок ананас","Сок яблоко","Сок апельсин","Сок маракуйя"],a:0},
+{v:2,q:"Какой ликер помимо текилы входит в «Хопс Палома»?",o:["Ликер трипл сек","Ликер кофе","Ликер мараскино","Ликер фиалка","Ликер персик"],a:0},
+{v:2,q:"Какое вино помимо джина входит в «1001 ночь»?",o:["Совиньон блан","Красное вино","Розовое вино","Портвейн","Игристое вино"],a:0},
+{v:2,q:"Что добавляет газированность в коктейль «Апероль спритц»?",o:["Вода газированная","Тоник","Кола","Спрайт","Содовая"],a:0},
+{v:2,q:"Какой сироп входит в коктейль «Царица»?",o:["Сироп яблоко","Сироп маракуйя","Сироп клубника","Сироп миндаль","Сироп кокос"],a:0},
+{v:2,q:"Какой ликер входит в коктейль «Эпл Сиритц»?",o:["Ликер яблоко","Ликер кофе","Ликер мараскино","Ликер фиалка","Ликер трипл сек"],a:0}
+];
+
+let submitted = false, testStarted = false, secondsLeft = 0, timerInterval = null, TEST_TIME_MIN = 15, userName = '';
+
+function render() {
+  const box = document.getElementById('testBox');
+  let html = '';
+  Q.forEach((q, i) => {
+    html += `<div class="question" id="q${i}" style="display:none"><h3>${i + 1}. ${q.q}</h3>`;
+    q.o.forEach((opt, j) => {
+      html += `<label class="option" id="q${i}o${j}"><input type="radio" name="q${i}" value="${j}" onchange="updateProgress()"><span>${opt}</span></label>`;
+    });
+    html += `</div>`;
+  });
+  html += `<button class="btn" id="submitBtn" onclick="submit(false)" style="display:none">Сдать тест</button>
+           <button class="btn secondary" id="resetBtn" style="display:none" onclick="reset()">Пройти заново</button>`;
+  box.innerHTML = html;
+}
+
+function startTest() {
+  const name = document.getElementById('userName').value.trim();
+  if (name.length < 3) {
+    const w = document.getElementById('warning');
+    w.textContent = 'Укажите ФИО сотрудника (минимум 3 символа).';
+    w.classList.add('show');
+    document.getElementById('userName').focus();
+    return;
+  }
+  userName = name;
+  testStarted = true;
+  document.getElementById('nameBlock').style.display = 'none';
+  document.getElementById('progress').style.display = 'block';
+  document.getElementById('submitBtn').style.display = 'block';
+  document.querySelectorAll('.question').forEach(el => el.style.display = 'block');
+  document.getElementById('warning').classList.remove('show');
+  loadTimerSetting();
+}
+
+function loadTimerSetting() {
+  jsonp(WEB_APP_URL + '?action=getSettings', (data) => {
+    if (data && data.settings && data.settings[TEST_FILE]) {
+      TEST_TIME_MIN = parseInt(data.settings[TEST_FILE]) || 15;
+    }
+    startTimer();
+  });
+}
+
+function startTimer() {
+  secondsLeft = TEST_TIME_MIN * 60;
+  updateTimerDisplay();
+  document.getElementById('timerBox').style.display = 'block';
+  timerInterval = setInterval(() => {
+    secondsLeft--;
+    updateTimerDisplay();
+    if (secondsLeft <= 0) { clearInterval(timerInterval); submit(true); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const min = Math.floor(secondsLeft / 60);
+  const sec = secondsLeft % 60;
+  document.getElementById('timerText').textContent = String(min).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+  const box = document.getElementById('timerBox');
+  box.classList.remove('warn', 'danger');
+  if (secondsLeft <= 60) box.classList.add('danger');
+  else if (secondsLeft <= 300) box.classList.add('warn');
+}
+
+function updateProgress() {
+  if (submitted) return;
+  let answered = 0;
+  Q.forEach((q, i) => { if (document.querySelector(`input[name="q${i}"]:checked`)) answered++; });
+  document.getElementById('progress').textContent = `Отвечено: ${answered} из ${Q.length}`;
+  document.getElementById('warning').classList.remove('show');
+}
+
+function submit(isAuto) {
+  if (submitted || !testStarted) return;
+
+  if (!isAuto) {
+    let unanswered = 0;
+    Q.forEach((q, i) => { if (!document.querySelector(`input[name="q${i}"]:checked`)) unanswered++; });
+    if (unanswered > 0) {
+      const w = document.getElementById('warning');
+      w.textContent = `Ответьте на все вопросы. Осталось: ${unanswered}.`;
+      w.classList.add('show');
+      w.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    if (!confirm('Сдать тест? После этого изменить ответы будет нельзя.')) return;
+  } else {
+    alert('⏰ Время истекло! Тест сдан автоматически.');
+  }
+
+  if (timerInterval) clearInterval(timerInterval);
+  document.getElementById('timerBox').style.display = 'none';
+
+  let score = 0;
+  const details = [];
+  Q.forEach((q, i) => {
+    const qDiv = document.getElementById(`q${i}`);
+    const selected = qDiv.querySelector('input:checked');
+    const userAns = selected ? +selected.value : -1;
+    const isCorrect = userAns === q.a;
+    if (isCorrect) score++;
+    details.push(`${i + 1}. ${q.q}\nОтвет: ${userAns >= 0 ? q.o[userAns] : '—'}\nПравильный: ${q.o[q.a]}\n${isCorrect ? '✅ Верно' : '❌ Ошибка'}`);
+    q.o.forEach((opt, j) => {
+      const optLabel = document.getElementById(`q${i}o${j}`);
+      optLabel.querySelector('input').disabled = true;
+      optLabel.classList.add('locked');
+      if (j === q.a) optLabel.classList.add('correct');
+      if (userAns === j && j !== q.a) optLabel.classList.add('wrong');
+    });
+  });
+  submitted = true;
+
+  const total = Q.length;
+  const pct = Math.round((score / total) * 100);
+  let grade;
+  if (pct >= 90) grade = 5;
+  else if (pct >= 75) grade = 4;
+  else if (pct >= 60) grade = 3;
+  else grade = 2;
+
+  const payload = {
+    name: userName, testName: TEST_NAME,
+    score: `${score} из ${total}`,
+    pct, grade,
+    date: new Date().toLocaleString('ru-RU'),
+    details: details.join('\n\n')
+  };
+  fetch(WEB_APP_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(err => console.error('Ошибка отправки:', err));
+
+  const res = document.getElementById('result');
+  res.style.display = 'block';
+  res.className = 'result ' + (pct >= 60 ? 'pass' : 'fail');
+  res.innerHTML = `Результат: ${score} из ${total} (${pct}%) — оценка «${grade}»<small>${isAuto ? '⏰ Тест сдан автоматически. ' : ''}Результат отправлен руководителю.</small>`;
+
+  document.getElementById('submitBtn').style.display = 'none';
+  document.getElementById('resetBtn').style.display = 'block';
+  document.getElementById('progress').textContent = `Отвечено: ${total} из ${total} · Тест сдан`;
+  res.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function reset() {
+  submitted = false; testStarted = false;
+  if (timerInterval) clearInterval(timerInterval);
+  document.getElementById('timerBox').style.display = 'none';
+  document.getElementById('userName').value = '';
+  document.getElementById('nameBlock').style.display = 'block';
+  document.getElementById('progress').style.display = 'none';
+  document.getElementById('submitBtn').style.display = 'none';
+  document.getElementById('resetBtn').style.display = 'none';
+  document.querySelectorAll('.question').forEach(el => el.style.display = 'none');
+  Q.forEach((q, i) => {
+    const qDiv = document.getElementById(`q${i}`);
+    qDiv.querySelectorAll('input').forEach(inp => { inp.checked = false; inp.disabled = false; });
+    qDiv.querySelectorAll('.option').forEach(opt => opt.classList.remove('correct', 'wrong', 'locked'));
+  });
+  const res = document.getElementById('result');
+  res.style.display = 'none'; res.innerHTML = '';
+  document.getElementById('warning').classList.remove('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function jsonp(url, callback) {
+  const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  window[cbName] = (data) => {
+    callback(data);
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+  };
+  const script = document.createElement('script');
+  script.src = url + '&callback=' + cbName;
+  script.onerror = () => callback(null);
+  document.body.appendChild(script);
+  setTimeout(() => { if (window[cbName]) { callback(null); delete window[cbName]; } }, 8000);
+}
+
+render();
+</script>
+</body>
+</html>

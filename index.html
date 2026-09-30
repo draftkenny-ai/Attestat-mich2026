@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Аттестация МиЧ КМ</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(135deg,#4a90d9 0%,#2c5f8d 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:#1a1a1a}
+  .container{max-width:900px;width:100%}
+  .header{text-align:center;color:#fff;margin-bottom:36px}
+  .header h1{font-size:32px;font-weight:800;margin-bottom:10px;letter-spacing:-0.5px}
+  .header p{font-size:15px;opacity:.9;line-height:1.5}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+  .card{background:#fff;border-radius:16px;padding:28px 24px;box-shadow:0 4px 20px rgba(0,0,0,.12);transition:transform .15s,box-shadow .15s;text-decoration:none;color:inherit;display:block}
+  .card:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.18)}
+  .card-num{display:inline-block;width:42px;height:42px;line-height:42px;text-align:center;background:#4a90d9;color:#fff;border-radius:12px;font-weight:700;font-size:17px;margin-bottom:16px}
+  .card h2{font-size:18px;font-weight:700;margin-bottom:8px}
+  .card p{font-size:13.5px;color:#666;line-height:1.5;margin-bottom:14px}
+  .card .meta{font-size:12.5px;color:#4a90d9;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .card .timer-badge{background:#eef4fb;color:#4a90d9;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:700}
+  .lock-screen{background:#fff;padding:40px 32px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:400px;margin:0 auto;text-align:center}
+  .lock-screen h2{font-size:20px;margin-bottom:8px}
+  .lock-screen p{color:#666;font-size:13.5px;margin-bottom:22px}
+  .lock-screen input{width:100%;padding:14px 16px;font-size:16px;border:2px solid #d0d7de;border-radius:10px;outline:none;text-align:center;letter-spacing:2px;transition:border .15s}
+  .lock-screen input:focus{border-color:#4a90d9}
+  .lock-screen button{width:100%;padding:14px;margin-top:14px;font-size:15px;font-weight:700;background:#4a90d9;color:#fff;border:none;border-radius:10px;cursor:pointer;transition:.15s}
+  .lock-screen button:hover{background:#357abd}
+  .lock-error{color:#d9534f;font-size:13px;margin-top:10px;height:16px}
+  .footer{text-align:center;color:#fff;opacity:.75;font-size:12.5px;margin-top:36px;line-height:1.6}
+  .footer a{color:#fff;text-decoration:underline;opacity:.8}
+  @media (max-width:600px){.header h1{font-size:24px}.header p{font-size:13.5px}.card{padding:22px 18px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div id="lockScreen" class="lock-screen">
+    <h2>🔒 Доступ закрыт</h2>
+    <p>Введите пароль, чтобы открыть аттестацию</p>
+    <input type="password" id="pwdInput" placeholder="Пароль" onkeydown="if(event.key==='Enter')unlock()">
+    <button onclick="unlock()">Открыть</button>
+    <div class="lock-error" id="lockError"></div>
+  </div>
+
+  <div id="mainContent" style="display:none">
+    <div class="header">
+      <h1>Аттестация МиЧ КМ</h1>
+      <p>Регулярная полугодовая аттестация сотрудников.<br>Выберите тест ниже. После прохождения результат отправится руководителю.</p>
+    </div>
+    <div class="cards">
+      <a class="card" href="test1.html">
+        <div class="card-num">№1</div>
+        <h2>Бармен · Метод и посуда</h2>
+        <p>Метод приготовления, посуда, характеристики коктейлей.</p>
+        <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="test1.html">— мин</span></div>
+      </a>
+      <a class="card" href="test2.html">
+        <div class="card-num">№2</div>
+        <h2>Бармен · Ингредиенты</h2>
+        <p>Состав коктейлей: основной и второстепенные ингредиенты.</p>
+        <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="test2.html">— мин</span></div>
+      </a>
+      <a class="card" href="test3.html">
+        <div class="card-num">№3</div>
+        <h2>Бармен · Измерения</h2>
+        <p>Объёмы ингредиентов в литрах по технологическим картам.</p>
+        <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="test3.html">— мин</span></div>
+      </a>
+      <a class="card" href="service.html">
+        <div class="card-num">№4</div>
+        <h2>Сервис</h2>
+        <p>Санитарные нормы, цикл сервиса, запара, предложение и конфликты.</p>
+        <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="service.html">— мин</span></div>
+      </a>
+    </div>
+    <div class="footer">
+      Gask Bro Group · <a href="admin.html">Панель руководителя</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxFxRX6ohQrDWxSJezONoX9q_Id09GOpCan_x6UtLQoix1terh0pVmYKn4_ecroHV0Q/exec';
+
+// Пароль отключён — сразу показываем главную
+showMain();
+
+function showMain() {
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+  loadTimers();
+}
+
+function loadTimers() {
+  jsonp(WEB_APP_URL + '?action=getSettings', (data) => {
+    if (data && data.settings) {
+      document.querySelectorAll('.timer-badge').forEach(el => {
+        const test = el.dataset.test;
+        const min = data.settings[test];
+        if (min) el.textContent = min + ' мин';
+      });
+    }
+  });
+}
+
+function jsonp(url, callback) {
+  const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  window[cbName] = (data) => {
+    callback(data);
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+  };
+  const script = document.createElement('script');
+  script.src = url + '&callback=' + cbName;
+  script.onerror = () => callback(null);
+  document.body.appendChild(script);
+  setTimeout(() => { if (window[cbName]) { callback(null); delete window[cbName]; } }, 8000);
+}
+</script>
+</body>
+</html>
