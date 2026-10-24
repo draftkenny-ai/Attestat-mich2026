@@ -3,23 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Школа "Моряк и Чайка</title>
+<title>Аттестация МиЧ КМ</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(135deg,#4a90d9 0%,#2c5f8d 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:#1a1a1a}
-  .container{max-width:900px;width:100%}
-  .header{text-align:center;color:#fff;margin-bottom:36px}
-  .header h1{font-size:32px;font-weight:800;margin-bottom:10px;letter-spacing:-0.5px}
-  .header p{font-size:15px;opacity:.9;line-height:1.5}
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
-  .card{background:#fff;border-radius:16px;padding:28px 24px;box-shadow:0 4px 20px rgba(0,0,0,.12);transition:transform .15s,box-shadow .15s;text-decoration:none;color:inherit;display:block}
-  .card:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.18)}
-  .card-num{display:inline-block;width:42px;height:42px;line-height:42px;text-align:center;background:#4a90d9;color:#fff;border-radius:12px;font-weight:700;font-size:17px;margin-bottom:16px}
-  .card h2{font-size:18px;font-weight:700;margin-bottom:8px}
-  .card p{font-size:13.5px;color:#666;line-height:1.5;margin-bottom:14px}
-  .card .meta{font-size:12.5px;color:#4a90d9;font-weight:600;display:flex;justify-content:space-between;align-items:center}
-  .card .timer-badge{background:#eef4fb;color:#4a90d9;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:700}
-  .lock-screen{background:#fff;padding:40px 32px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.12);max-width:400px;margin:0 auto;text-align:center}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(160deg,#4a90d9 0%,#2c5f8d 60%,#1e466b 100%);min-height:100vh;padding:24px 20px;color:#1a1a1a}
+  .container{max-width:1080px;margin:0 auto}
+
+  /* ===== ЗАГЛУШКА ПАРОЛЯ ===== */
+  .lock-screen{background:#fff;padding:40px 32px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.18);max-width:400px;margin:80px auto;text-align:center}
   .lock-screen h2{font-size:20px;margin-bottom:8px}
   .lock-screen p{color:#666;font-size:13.5px;margin-bottom:22px}
   .lock-screen input{width:100%;padding:14px 16px;font-size:16px;border:2px solid #d0d7de;border-radius:10px;outline:none;text-align:center;letter-spacing:2px;transition:border .15s}
@@ -27,14 +18,66 @@
   .lock-screen button{width:100%;padding:14px;margin-top:14px;font-size:15px;font-weight:700;background:#4a90d9;color:#fff;border:none;border-radius:10px;cursor:pointer;transition:.15s}
   .lock-screen button:hover{background:#357abd}
   .lock-error{color:#d9534f;font-size:13px;margin-top:10px;height:16px}
-  .footer{text-align:center;color:#fff;opacity:.75;font-size:12.5px;margin-top:36px;line-height:1.6}
-  .footer a{color:#fff;text-decoration:underline;opacity:.8}
-  @media (max-width:600px){.header h1{font-size:24px}.header p{font-size:13.5px}.card{padding:22px 18px}}
+
+  /* ===== ГЛАВНАЯ ===== */
+  .header{text-align:center;color:#fff;margin-bottom:36px}
+  .header h1{font-size:34px;font-weight:800;margin-bottom:10px;letter-spacing:-.5px}
+  .header p{font-size:15px;opacity:.92;line-height:1.5;max-width:640px;margin:0 auto}
+
+  .section{background:#fff;border-radius:20px;padding:28px;margin-bottom:26px;box-shadow:0 10px 32px rgba(0,0,0,.15)}
+  .section-head{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:16px;border-bottom:2px solid #eef2f7}
+  .section-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+  .section-icon.intro{background:#e8f1fb;color:#4a90d9}
+  .section-icon.alco{background:#fdf1e3;color:#d98428}
+  .section-head h2{font-size:22px;font-weight:800;color:#1a1a1a}
+  .section-head .section-sub{font-size:13px;color:#777;margin-top:2px}
+
+  .subsection{margin-bottom:6px}
+  .subsection:last-child{margin-bottom:0}
+  .subsection-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .subsection-head h3{font-size:15px;font-weight:700;color:#333;text-transform:uppercase;letter-spacing:.6px}
+  .subsection-head .badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:#eef2f7;color:#5a6b7a}
+  .subsection-head .badge.ready{background:#e6f6eb;color:#1e7e34}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .card{background:#f8fafc;border:2px solid #eef2f7;border-radius:14px;padding:20px;text-decoration:none;color:inherit;display:block;transition:transform .15s,border-color .15s,box-shadow .15s;position:relative}
+  .card:hover{transform:translateY(-3px);border-color:#4a90d9;box-shadow:0 6px 20px rgba(74,144,217,.15)}
+  .card-num{display:inline-block;min-width:38px;height:32px;line-height:32px;padding:0 10px;text-align:center;background:#4a90d9;color:#fff;border-radius:9px;font-weight:700;font-size:13px;margin-bottom:12px}
+  .card.alco .card-num{background:#d98428}
+  .card h4{font-size:15.5px;font-weight:700;margin-bottom:6px;color:#1a1a1a;line-height:1.35}
+  .card p{font-size:12.5px;color:#666;line-height:1.5;margin-bottom:12px}
+  .card .meta{font-size:12px;color:#4a90d9;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .card.alco .meta{color:#d98428}
+  .card .timer-badge{background:#eef4fb;color:#4a90d9;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+  .card.alco .timer-badge{background:#fdf1e3;color:#d98428}
+
+  /* Заглушка для лекций */
+  .lectures-placeholder{background:#f8fafc;border:2px dashed #d0d7de;border-radius:14px;padding:30px 24px;text-align:center;color:#7a8593}
+  .lectures-placeholder .icon{font-size:34px;margin-bottom:10px;opacity:.6}
+  .lectures-placeholder h4{font-size:15px;font-weight:700;color:#5a6b7a;margin-bottom:6px}
+  .lectures-placeholder p{font-size:13px;line-height:1.5;max-width:420px;margin:0 auto}
+
+  .footer{text-align:center;color:#fff;opacity:.75;font-size:12.5px;margin-top:36px;line-height:1.7}
+  .footer a{color:#fff;text-decoration:underline;opacity:.85}
+  .footer a:hover{opacity:1}
+
+  @media (max-width:600px){
+    body{padding:16px 12px}
+    .header h1{font-size:24px}
+    .header p{font-size:13px}
+    .section{padding:20px 16px;border-radius:16px}
+    .section-head h2{font-size:18px}
+    .section-icon{width:40px;height:40px;font-size:20px}
+    .cards{grid-template-columns:1fr}
+    .card{padding:16px}
+  }
 </style>
 </head>
 <body>
 <div class="container">
 
+  <!-- Экран пароля (по умолчанию скрыт — раскомментируйте блок ниже, если хотите включить пароль) -->
+  <!--
   <div id="lockScreen" class="lock-screen">
     <h2>🔒 Доступ закрыт</h2>
     <p>Введите пароль, чтобы открыть аттестацию</p>
@@ -42,74 +85,140 @@
     <button onclick="unlock()">Открыть</button>
     <div class="lock-error" id="lockError"></div>
   </div>
+  -->
 
-  <div id="mainContent" style="display:none">
+  <div id="mainContent">
     <div class="header">
-      <h1>Школа "Моряк и Чайка"</h1>
-      <p>Стать другом для гостя - это знать всё о своём баре<br>Слушай тренера - будь хорошим барменом</p>
+      <h1>Аттестация МиЧ КМ</h1>
+      <p>Регулярная полугодовая аттестация сотрудников.<br>Выберите раздел и пройдите тестирование. Результат автоматически отправляется руководителю.</p>
     </div>
-    <div class="cards">
-      <a class="card" href="test1.html">
-        <div class="card-num">№1</div>
-        <h2>Бармен · Метод и посуда</h2>
-        <p>Метод приготовления, посуда, характеристики коктейлей.</p>
-        <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="test1.html">— мин</span></div>
-      </a>
-      <a class="card" href="test2.html">
-        <div class="card-num">№2</div>
-        <h2>Бармен · Ингредиенты</h2>
-        <p>Состав коктейлей: основной и второстепенные ингредиенты.</p>
-        <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="test2.html">— мин</span></div>
-      </a>
-      <a class="card" href="test3.html">
-        <div class="card-num">№3</div>
-        <h2>Бармен · Измерения</h2>
-        <p>Объёмы ингредиентов в литрах по технологическим картам.</p>
-        <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="test3.html">— мин</span></div>
-      </a>
-      <a class="card" href="service.html">
-        <div class="card-num">№4</div>
-        <h2>Сервис</h2>
-        <p>Санитарные нормы, цикл сервиса, запара, предложение и конфликты.</p>
-        <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="service.html">— мин</span></div>
-      </a>
-     <a class="card" href="alco1.html">
-  <div class="card-num">A1</div>
-  <h2>Алкоголь · История и производство</h2>
-  <p>История брендов и технологии производства спиртных напитков.</p>
-  <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="alco1.html">— мин</span></div>
-</a>
-<a class="card" href="alco2.html">
-  <div class="card-num">A2</div>
-  <h2>Алкоголь · Вкусоароматика</h2>
-  <p>Вкусовые профили, ноты и крепость напитков из справочника.</p>
-  <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="alco2.html">— мин</span></div>
-</a>
-<a class="card" href="alco3.html">
-  <div class="card-num">A3</div>
-  <h2>Алкоголь · Как объяснить гостю</h2>
-  <p>Категории, подача и правильные формулировки для рекомендаций.</p>
-  <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="alco3.html">— мин</span></div>
-</a>
+
+    <!-- ========== РАЗДЕЛ: ВСТУПЛЕНИЕ ========== -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon intro">📘</div>
+        <div>
+          <h2>Вступление</h2>
+          <div class="section-sub">Базовые знания: сервис, технологические карты, стандарты работы</div>
+        </div>
+      </div>
+
+      <!-- Вступление → Лекции -->
+      <div class="subsection">
+        <div class="subsection-head">
+          <h3>📖 Лекции</h3>
+          <span class="badge">Скоро</span>
+        </div>
+        <div class="lectures-placeholder">
+          <div class="icon">📚</div>
+          <h4>Материалы готовятся</h4>
+          <p>Здесь появятся лекции по сервису и технологическим картам. Раздел будет заполнен позже.</p>
+        </div>
+      </div>
+
+      <!-- Вступление → Тестирование -->
+      <div class="subsection" style="margin-top:22px">
+        <div class="subsection-head">
+          <h3>📝 Тестирование</h3>
+          <span class="badge ready">Доступно · 4 теста</span>
+        </div>
+        <div class="cards">
+          <a class="card" href="test1.html">
+            <div class="card-num">№1</div>
+            <h4>Бармен · Метод и посуда</h4>
+            <p>Метод приготовления, посуда, характеристики и типы коктейлей.</p>
+            <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="test1.html">— мин</span></div>
+          </a>
+          <a class="card" href="test2.html">
+            <div class="card-num">№2</div>
+            <h4>Бармен · Ингредиенты</h4>
+            <p>Состав коктейлей: основной алкоголь и второстепенные ингредиенты.</p>
+            <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="test2.html">— мин</span></div>
+          </a>
+          <a class="card" href="test3.html">
+            <div class="card-num">№3</div>
+            <h4>Бармен · Измерения</h4>
+            <p>Объёмы ингредиентов в литрах по технологическим картам.</p>
+            <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="test3.html">— мин</span></div>
+          </a>
+          <a class="card" href="service.html">
+            <div class="card-num">С</div>
+            <h4>Сервис</h4>
+            <p>Санитарные нормы, цикл сервиса, запара, предложение и конфликты.</p>
+            <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="service.html">— мин</span></div>
+          </a>
+        </div>
+      </div>
     </div>
+
+    <!-- ========== РАЗДЕЛ: СПИРТЫ И АЛКОГОЛЬ ========== -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon alco">🥃</div>
+        <div>
+          <h2>Спирты и Алкоголь</h2>
+          <div class="section-sub">История брендов, производство и вкусоароматические характеристики</div>
+        </div>
+      </div>
+
+      <!-- Спирты и Алкоголь → Лекции -->
+      <div class="subsection">
+        <div class="subsection-head">
+          <h3>📖 Лекции</h3>
+          <span class="badge">Скоро</span>
+        </div>
+        <div class="lectures-placeholder">
+          <div class="icon">📖</div>
+          <h4>Материалы готовятся</h4>
+          <p>Здесь появятся лекции по алкогольной карте бара. Раздел будет заполнен позже.</p>
+        </div>
+      </div>
+
+      <!-- Спирты и Алкоголь → Тестирование -->
+      <div class="subsection" style="margin-top:22px">
+        <div class="subsection-head">
+          <h3>📝 Тестирование</h3>
+          <span class="badge ready">Доступно · 3 теста</span>
+        </div>
+        <div class="cards">
+          <a class="card alco" href="alco1.html">
+            <div class="card-num">A1</div>
+            <h4>История и производство</h4>
+            <p>История брендов, винокурни, технологии и регионы производства спиртных напитков.</p>
+            <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="alco1.html">— мин</span></div>
+          </a>
+          <a class="card alco" href="alco2.html">
+            <div class="card-num">A2</div>
+            <h4>Вкусоароматика</h4>
+            <p>Вкусовые профили, ноты и крепость напитков из справочника.</p>
+            <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="alco2.html">— мин</span></div>
+          </a>
+          <a class="card alco" href="alco3.html">
+            <div class="card-num">A3</div>
+            <h4>Как объяснить гостю</h4>
+            <p>Категории, подача и правильные формулировки для рекомендаций гостю.</p>
+            <div class="meta"><span>50 вопросов</span><span class="timer-badge" data-test="alco3.html">— мин</span></div>
+          </a>
+        </div>
+      </div>
+    </div>
+
     <div class="footer">
-      Gask Bro Group · <a href="admin.html">Панель руководителя</a>
+      Gask Bro Group · Внутренний портал аттестации<br>
+      <a href="admin.html">Панель руководителя</a>
     </div>
   </div>
 
 </div>
 
 <script>
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxFxRX6ohQrDWxSJezONoX9q_Id09GOpCan_x6UtLQoix1terh0pVmYKn4_ecroHV0Q/exec';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZTqxuRO5vVcZs5Q9MlPbtPK9gEnMlEWFpJpq3FtQsdi_cPR4y/exec';
+const STORAGE_KEY = 'mich_auth';
 
-// Пароль отключён — сразу показываем главную
-showMain();
-
-function showMain() {
-  document.getElementById('lockScreen').style.display = 'none';
-  document.getElementById('mainContent').style.display = 'block';
+/* Автозагрузка таймеров */
+document.addEventListener('DOMContentLoaded', () => {
   loadTimers();
-}
+});
 
 function loadTimers() {
   jsonp(WEB_APP_URL + '?action=getSettings', (data) => {
