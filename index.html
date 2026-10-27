@@ -65,9 +65,33 @@
   .lectures-placeholder h4{font-size:15px;font-weight:700;color:#5a6b7a;margin-bottom:6px}
   .lectures-placeholder p{font-size:13px;line-height:1.5;max-width:420px;margin:0 auto}
 
-  .footer{text-align:center;color:#fff;opacity:.75;font-size:12.5px;margin-top:36px;line-height:1.7}
-  .footer a{color:#fff;text-decoration:underline;opacity:.85}
-  .footer a:hover{opacity:1}
+    /* ===== ФУТЕР ===== */
+  .footer {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.85); /* Белый цвет с легкой прозрачностью */
+    font-size: 13.5px;
+    margin-top: 40px;
+    padding-bottom: 30px;
+    line-height: 1.8;
+    background: transparent;
+  }
+  .footer a {
+    color: #fff;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.15); /* Легкий фон для кнопки */
+    padding: 8px 18px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-top: 12px;
+    font-weight: 600;
+    font-size: 13px;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .footer a:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px); /* Легкий эффект при наведении */
+    text-decoration: none;
+  }
 
   @media (max-width:600px){
     body{padding:16px 12px}
@@ -333,7 +357,7 @@
         </div>
       </div>
 
-        <!-- ========== РАЗДЕЛ: ИТОГОВАЯ АТТЕСТАЦИЯ ========== -->
+    <!-- ========== РАЗДЕЛ: ИТОГОВАЯ АТТЕСТАЦИЯ ========== -->
     <div class="section">
       <div class="section-head">
         <div class="section-icon final">🎓</div>
@@ -358,7 +382,7 @@
     </div>
     <!-- КОНЕЦ РАЗДЕЛА "ИТОГОВАЯ АТТЕСТАЦИЯ" -->
 
-    <!-- ФУТЕР (должен быть ВНЕ всех .section) -->
+    <!-- ФУТЕР (находится ВНЕ белых карточек) -->
     <div class="footer">
       Gask Bro Group · Хорошие люди, после смерти, попадают в бар!<br>
       <a href="admin.html">🔐 Панель руководителя</a>
@@ -367,7 +391,44 @@
   </div> <!-- Закрывается div id="mainContent" -->
 </div> <!-- Закрывается div class="container" -->
 
-</div>
+<!-- ⚠️ ВАЖНО: ЗДЕСЬ НЕ ДОЛЖНО БЫТЬ ЛИШНИХ </div> -->
+
+<script>
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZTqxuRO5vVcZs5Q9MlPbtPK9gEnMlEWFpJpq3FtQsdi_cPR4y/exec';
+const STORAGE_KEY = 'mich_auth';
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadTimers();
+});
+
+function loadTimers() {
+  jsonp(WEB_APP_URL + '?action=getSettings', (data) => {
+    if (data && data.settings) {
+      document.querySelectorAll('.timer-badge').forEach(el => {
+        const test = el.dataset.test;
+        const min = data.settings[test];
+        if (min) el.textContent = min + ' мин';
+      });
+    }
+  });
+}
+
+function jsonp(url, callback) {
+  const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  window[cbName] = (data) => {
+    callback(data);
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+  };
+  const script = document.createElement('script');
+  script.src = url + '&callback=' + cbName;
+  script.onerror = () => callback(null);
+  document.body.appendChild(script);
+  setTimeout(() => { if (window[cbName]) { callback(null); delete window[cbName]; } }, 8000);
+}
+</script>
+</body>
+</html>
  
 <script>
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZTqxuRO5vVcZs5Q9MlPbtPK9gEnMlEWFpJpq3FtQsdi_cPR4y/exec';
