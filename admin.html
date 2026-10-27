@@ -11,7 +11,7 @@
   h1{font-size:24px;margin-bottom:6px}
   .sub{color:#666;font-size:13.5px;margin-bottom:24px}
   
-  /* Заглушка пароля (отключена) */
+  /* Экран блокировки */
   .lock-screen{background:#fff;padding:40px 32px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.08);max-width:400px;margin:60px auto;text-align:center}
   .lock-screen h2{font-size:20px;margin-bottom:8px}
   .lock-screen p{color:#666;font-size:13.5px;margin-bottom:22px}
@@ -21,6 +21,7 @@
   .lock-screen button:hover{background:#357abd}
   .lock-error{color:#d9534f;font-size:13px;margin-top:10px;height:16px}
 
+  /* Панель */
   .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
   .tab{padding:10px 20px;background:#fff;border:2px solid #d0d7de;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;color:#333;transition:.15s}
   .tab:hover{border-color:#4a90d9}
@@ -62,17 +63,19 @@
 </head>
 <body>
 
+<!-- ЭКРАН ПАРОЛЯ (по умолчанию виден) -->
 <div id="lockScreen" class="lock-screen">
   <h2>🔐 Панель руководителя</h2>
-  <p>Введите пароль руководителя</p>
+  <p>Введите пароль руководителя для доступа</p>
   <input type="password" id="pwdInput" placeholder="Пароль" onkeydown="if(event.key==='Enter')unlock()">
   <button onclick="unlock()">Войти</button>
   <div class="lock-error" id="lockError"></div>
 </div>
 
+<!-- ПАНЕЛЬ (скрыта до ввода пароля) -->
 <div id="panel" class="container" style="display:none">
   <h1>Панель руководителя</h1>
-  <div class="sub">Школа Барменов МиЧ · Gask Bro Group</div>
+  <div class="sub">Аттестация МиЧ КМ · Gask Bro Group</div>
 
   <div class="tabs">
     <button class="tab active" onclick="showTab('results', this)">📊 Результаты</button>
@@ -233,7 +236,6 @@ function loadSettings() {
   jsonp(WEB_APP_URL + '?action=getSettings', (data) => {
     if (!data || !data.settings) { list.innerHTML = 'Ошибка загрузки'; return; }
     
-    // Полный список всех тестов с их названиями и дефолтным временем
     const names = {
       'test1.html': { name: 'Тест №1 · Бармен — Метод и посуда', time: 20 },
       'test2.html': { name: 'Тест №2 · Бармен — Ингредиенты', time: 20 },
@@ -267,7 +269,7 @@ function loadSettings() {
 
 function saveSetting(test) {
   const min = parseInt(document.getElementById('set_' + test).value) || 15;
- jsonp(WEB_APP_URL + '?action=setSettings&pwd=' + encodeURIComponent(currentPwd) + '&test=' + encodeURIComponent(test) + '&minutes=' + min, (data) => {
+  jsonp(WEB_APP_URL + '?action=setSettings&pwd=' + encodeURIComponent(currentPwd) + '&test=' + encodeURIComponent(test) + '&minutes=' + min, (data) => {
     if (data && data.status === 'ok') showToast('✅ Сохранено: ' + min + ' мин');
     else showToast('❌ Ошибка сохранения');
   });
