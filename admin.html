@@ -90,6 +90,7 @@
        <option value="Тест по алкоголю №1">Алкоголь · История</option>
 <option value="Тест по алкоголю №2">Алкоголь · Вкус</option>
 <option value="Тест по алкоголю №3">Алкоголь · Гостю</option>
+       <option value="Тест · Пиво и сидр">Пиво и сидр</option>
       </select>
       <label>Оценка:</label>
       <select id="filterGrade" onchange="renderTable()">
@@ -206,6 +207,7 @@ function loadSettings() {
       'test2.html': 'Тест №2 · Бармен — Ингредиенты',
       'test3.html': 'Тест №3 · Бармен — Измерения',
       'service.html': 'Тест · Сервис'
+     'beer1.html': 'Тест · Пиво и сидр'
     };
     let html = '';
     Object.keys(names).forEach(key => {
