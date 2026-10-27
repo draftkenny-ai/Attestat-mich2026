@@ -9,17 +9,14 @@
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(160deg,#4a90d9 0%,#2c5f8d 60%,#1e466b 100%);min-height:100vh;padding:24px 20px;color:#1a1a1a}
   .container{max-width:1080px;margin:0 auto}
 
-  /* ===== ЗАГЛУШКА ПАРОЛЯ ===== */
   .lock-screen{background:#fff;padding:40px 32px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.18);max-width:400px;margin:80px auto;text-align:center}
   .lock-screen h2{font-size:20px;margin-bottom:8px}
   .lock-screen p{color:#666;font-size:13.5px;margin-bottom:22px}
-  .lock-screen input{width:100%;padding:14px 16px;font-size:16px;border:2px solid #d0d7de;border-radius:10px;outline:none;text-align:center;letter-spacing:2px;transition:border .15s}
+  .lock-screen input{width:100%;padding:14px 16px;font-size:16px;border:2px solid #d0d7de;border-radius:10px;outline:none;text-align:center;letter-spacing:2px}
   .lock-screen input:focus{border-color:#4a90d9}
-  .lock-screen button{width:100%;padding:14px;margin-top:14px;font-size:15px;font-weight:700;background:#4a90d9;color:#fff;border:none;border-radius:10px;cursor:pointer;transition:.15s}
-  .lock-screen button:hover{background:#357abd}
+  .lock-screen button{width:100%;padding:14px;margin-top:14px;font-size:15px;font-weight:700;background:#4a90d9;color:#fff;border:none;border-radius:10px;cursor:pointer}
   .lock-error{color:#d9534f;font-size:13px;margin-top:10px;height:16px}
 
-  /* ===== ГЛАВНАЯ ===== */
   .header{text-align:center;color:#fff;margin-bottom:36px}
   .header h1{font-size:34px;font-weight:800;margin-bottom:10px;letter-spacing:-.5px}
   .header p{font-size:15px;opacity:.92;line-height:1.5;max-width:640px;margin:0 auto}
@@ -63,7 +60,6 @@
   .card .timer-badge{background:#eef4fb;color:#4a90d9;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
   .card.alco .timer-badge{background:#fdf1e3;color:#d98428}
 
-  /* Заглушка для лекций */
   .lectures-placeholder{background:#f8fafc;border:2px dashed #d0d7de;border-radius:14px;padding:30px 24px;text-align:center;color:#7a8593}
   .lectures-placeholder .icon{font-size:34px;margin-bottom:10px;opacity:.6}
   .lectures-placeholder h4{font-size:15px;font-weight:700;color:#5a6b7a;margin-bottom:6px}
@@ -88,17 +84,6 @@
 <body>
 <div class="container">
 
-  <!-- Экран пароля (по умолчанию скрыт — раскомментируйте блок ниже, если хотите включить пароль) -->
-  <!--
-  <div id="lockScreen" class="lock-screen">
-    <h2>🔒 Доступ закрыт</h2>
-    <p>Введите пароль, чтобы открыть аттестацию</p>
-    <input type="password" id="pwdInput" placeholder="Пароль" onkeydown="if(event.key==='Enter')unlock()">
-    <button onclick="unlock()">Открыть</button>
-    <div class="lock-error" id="lockError"></div>
-  </div>
-  -->
-
   <div id="mainContent">
     <div class="header">
       <h1>Школа Барменов "Моряк и Чайка"</h1>
@@ -116,21 +101,21 @@
       </div>
 
       <!-- Вступление → Лекции -->
-     <div class="subsection">
-  <div class="subsection-head">
-    <h3>📖 Лекции</h3>
-    <span class="badge ready">Доступно</span>
-  </div>
-  <div class="cards">
-    <a class="card" href="https://drive.google.com/file/d/1v30dt9UxlVzJmkgfHu3W0COs0gnwCcPP/preview" target="_blank" rel="noopener">
-      <div class="card-num">📄</div>
-      <h4>Лекции по сервису</h4>
-      <p>Полный учебный материал по сервису.</p>
-      <div class="meta"><span>PDF · Google Drive</span><span class="timer-badge">Лекция</span></div>
-    </a>
-  </div>
-</div>
-     
+      <div class="subsection">
+        <div class="subsection-head">
+          <h3>📖 Лекции</h3>
+          <span class="badge ready">Доступно</span>
+        </div>
+        <div class="cards">
+          <a class="card" href="https://drive.google.com/file/d/1v30dt9UxlVzJmkgfHu3W0COs0gnwCcPP/preview" target="_blank" rel="noopener">
+            <div class="card-num">📄</div>
+            <h4>Лекции по сервису</h4>
+            <p>Полный учебный материал по сервису.</p>
+            <div class="meta"><span>PDF · Google Drive</span><span class="timer-badge">Лекция</span></div>
+          </a>
+        </div>
+      </div>
+
       <!-- Вступление → Тестирование -->
       <div class="subsection" style="margin-top:22px">
         <div class="subsection-head">
@@ -166,55 +151,6 @@
       </div>
     </div>
 
-   <!-- ========== РАЗДЕЛ: НАСТОЙКИ И ПИВО ========== -->
-<div class="section">
-  <div class="section-head">
-    <div class="section-icon beer">🍺</div>
-    <div>
-      <h2>Настойки и Пиво</h2>
-      <div class="section-sub">Классификация, производство, вкусовые характеристики</div>
-    </div>
-  </div>
-
-    <!-- Настойки и Пиво → Лекции -->
-  <div class="subsection">
-    <div class="subsection-head">
-      <h3>📖 Лекции</h3>
-      <span class="badge ready">Доступно · 2</span>
-    </div>
-    <div class="cards">
-      <a class="card beer" href="https://drive.google.com/file/d/1CNaD0zd15FRSOFaXk57Gg8ZG7xgj6a3O/preview" target="_blank" rel="noopener">
-        <div class="card-num">🍺</div>
-        <h4>Пиво</h4>
-        <p>Классификация, сорта, производство и вкусовые характеристики пива.</p>
-        <div class="meta"><span>PDF · Google Drive</span><span class="timer-badge">Лекция</span></div>
-      </a>
-      <a class="card beer" href="https://drive.google.com/file/d/1J_7BMPBkW4piBLGKuvgnmQs8X7k5XC0J/preview" target="_blank" rel="noopener">
-        <div class="card-num">🍯</div>
-        <h4>Настойки</h4>
-        <p>Виды настоек, производство, вкусовые профили и особенности подачи.</p>
-        <div class="meta"><span>PDF · Google Drive</span><span class="timer-badge">Лекция</span></div>
-      </a>
-    </div>
-  </div>
-
-    <!-- Настойки и Пиво → Тестирование -->
-  <div class="subsection" style="margin-top:22px">
-    <div class="subsection-head">
-      <h3>📝 Тестирование</h3>
-      <span class="badge ready">Доступно · 1 тест</span>
-    </div>
-    <div class="cards">
-      <a class="card beer" href="beer1.html">
-        <div class="card-num">B1</div>
-        <h4>Пиво и сидр</h4>
-        <p>Виды пива, сидр, подача, дефекты и позиции бара.</p>
-        <div class="meta"><span>25 вопросов</span><span class="timer-badge" data-test="beer1.html">— мин</span></div>
-      </a>
-    </div>
-  </div>
-
- 
     <!-- ========== РАЗДЕЛ: СПИРТЫ И АЛКОГОЛЬ ========== -->
     <div class="section">
       <div class="section-head">
@@ -225,7 +161,7 @@
         </div>
       </div>
 
-            <!-- Спирты и Алкоголь → Лекции -->
+      <!-- Спирты и Алкоголь → Лекции -->
       <div class="subsection">
         <div class="subsection-head">
           <h3>📖 Лекции</h3>
@@ -276,7 +212,7 @@
       </div>
     </div>
 
-       <!-- ========== РАЗДЕЛ: РЕГЛАМЕНТЫ ========== -->
+    <!-- ========== РАЗДЕЛ: РЕГЛАМЕНТЫ ========== -->
     <div class="section">
       <div class="section-head">
         <div class="section-icon reg">📋</div>
@@ -313,7 +249,56 @@
       </div>
     </div>
 
-       <!-- ========== РАЗДЕЛ: ИТОГОВАЯ АТТЕСТАЦИЯ ========== -->
+    <!-- ========== РАЗДЕЛ: НАСТОЙКИ И ПИВО ========== -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon beer">🍺</div>
+        <div>
+          <h2>Настойки и Пиво</h2>
+          <div class="section-sub">Классификация, производство, вкусовые характеристики</div>
+        </div>
+      </div>
+
+      <!-- Настойки и Пиво → Лекции -->
+      <div class="subsection">
+        <div class="subsection-head">
+          <h3>📖 Лекции</h3>
+          <span class="badge ready">Доступно · 2</span>
+        </div>
+        <div class="cards">
+          <a class="card beer" href="https://drive.google.com/file/d/1CNaD0zd15FRSOFaXk57Gg8ZG7xgj6a3O/preview" target="_blank" rel="noopener">
+            <div class="card-num">🍺</div>
+            <h4>Пиво</h4>
+            <p>Классификация, сорта, производство и вкусовые характеристики пива.</p>
+            <div class="meta"><span>PDF · Google Drive</span><span class="timer-badge">Лекция</span></div>
+          </a>
+          <a class="card beer" href="https://drive.google.com/file/d/1J_7BMPBkW4piBLGKuvgnmQs8X7k5XC0J/preview" target="_blank" rel="noopener">
+            <div class="card-num">🍯</div>
+            <h4>Настойки</h4>
+            <p>Виды настоек, производство, вкусовые профили и особенности подачи.</p>
+            <div class="meta"><span>PDF · Google Drive</span><span class="timer-badge">Лекция</span></div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Настойки и Пиво → Тестирование -->
+      <div class="subsection" style="margin-top:22px">
+        <div class="subsection-head">
+          <h3>📝 Тестирование</h3>
+          <span class="badge ready">Доступно · 1 тест</span>
+        </div>
+        <div class="cards">
+          <a class="card beer" href="beer1.html">
+            <div class="card-num">B1</div>
+            <h4>Пиво и сидр</h4>
+            <p>Виды пива, сидр, подача, дефекты и позиции бара.</p>
+            <div class="meta"><span>25 вопросов</span><span class="timer-badge" data-test="beer1.html">— мин</span></div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== РАЗДЕЛ: ИТОГОВАЯ АТТЕСТАЦИЯ ========== -->
     <div class="section">
       <div class="section-head">
         <div class="section-icon final">🎓</div>
@@ -338,7 +323,7 @@
     </div>
 
     <div class="footer">
-      Gask Bro Group · Хорошие люди, после смерти, попадают в бар!<br>
+      Gask Bro Group · Хорошие люди, после смерти, попадают в бар!
     </div>
   </div>
 
@@ -348,7 +333,6 @@
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZTqxuRO5vVcZs5Q9MlPbtPK9gEnMlEWFpJpq3FtQsdi_cPR4y/exec';
 const STORAGE_KEY = 'mich_auth';
 
-/* Автозагрузка таймеров */
 document.addEventListener('DOMContentLoaded', () => {
   loadTimers();
 });
