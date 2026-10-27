@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Вход · Школа Барменов МиЧ</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(160deg,#4a90d9 0%,#2c5f8d 60%,#1e466b 100%);min-height:100vh;padding:24px 16px;color:#1a1a1a}
+  .wrap{max-width:460px;margin:40px auto}
+  .card{background:#fff;border-radius:20px;padding:32px;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+  .logo{font-size:40px;text-align:center;margin-bottom:8px}
+  h1{font-size:20px;text-align:center;margin-bottom:6px;line-height:1.3}
+  .sub{color:#666;font-size:13px;text-align:center;margin-bottom:24px}
+  .tabs{display:flex;background:#f0f2f5;padding:4px;border-radius:10px;margin-bottom:22px}
+  .tab{flex:1;padding:10px;border:none;background:transparent;font-size:14px;font-weight:600;color:#666;cursor:pointer;border-radius:8px;transition:.15s}
+  .tab.active{background:#fff;color:#1a1a1a;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .panel{display:none}
+  .panel.active{display:block}
+  label{display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;margin-top:14px}
+  label:first-child{margin-top:0}
+  .req{color:#d9534f}
+  input,select{width:100%;padding:11px 14px;font-size:15px;border:2px solid #d0d7de;border-radius:9px;outline:none;transition:border .15s;font-family:inherit}
+  input:focus,select:focus{border-color:#4a90d9}
+  .btn{width:100%;padding:14px;margin-top:22px;font-size:15px;font-weight:700;background:#4a90d9;color:#fff;border:none;border-radius:10px;cursor:pointer;transition:.15s}
+  .btn:hover{background:#357abd}
+  .btn:disabled{background:#9ca3af;cursor:not-allowed}
+  .msg{margin-top:14px;padding:12px 14px;border-radius:9px;font-size:13px;line-height:1.5;display:none}
+  .msg.show{display:block}
+  .msg.error{background:#fdeaea;color:#8a1e1e;border-left:4px solid #d9534f}
+  .msg.success{background:#e6f6eb;color:#1e5b2a;border-left:4px solid #28a745}
+  .msg.info{background:#eef4fb;color:#1e466b;border-left:4px solid #4a90d9}
+  .hint{font-size:12px;color:#888;margin-top:6px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="card">
+    <div class="logo">🍸</div>
+    <h1>Школа Барменов «Моряк и Чайка»</h1>
+    <p class="sub">Личный кабинет обучения</p>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="login" onclick="switchTab('login')">Вход</button>
+      <button class="tab" data-tab="register" onclick="switchTab('register')">Регистрация</button>
+    </div>
+
+    <!-- ВХОД -->
+    <div id="panel-login" class="panel active">
+      <label>Телефон</label>
+      <input type="tel" id="login-phone" placeholder="+7 900 123-45-67" autocomplete="off">
+      <label>Пароль</label>
+      <input type="password" id="login-password" placeholder="Пароль" autocomplete="off">
+      <button class="btn" id="login-btn" onclick="doLogin()">Войти</button>
+      <div class="msg" id="login-msg"></div>
+    </div>
+
+    <!-- РЕГИСТРАЦИЯ -->
+    <div id="panel-register" class="panel">
+      <label>Бар <span class="req">*</span></label>
+      <select id="reg-bar">
+        <option value="">— выберите бар —</option>
+        <option>МиЧ Пятницкая</option>
+        <option>МиЧ Маросейка</option>
+        <option>МиЧ Новослободская</option>
+        <option>МиЧ Белорусская</option>
+        <option>МиЧ Покровка</option>
+        <option>МиЧ КМ</option>
+        <option>МиЧ Лубянка</option>
+      </select>
+
+      <label>ФИО <span class="req">*</span></label>
+      <input type="text" id="reg-name" placeholder="Иванов Иван Иванович" autocomplete="off">
+
+      <label>Дата рождения <span class="req">*</span></label>
+      <input type="date" id="reg-birthdate" max="2010-01-01">
+
+      <label>Телефон <span class="req">*</span></label>
+      <input type="tel" id="reg-phone" placeholder="+7 900 123-45-67" autocomplete="off">
+
+      <label>Telegram</label>
+      <input type="text" id="reg-telegram" placeholder="@username" autocomplete="off">
+
+      <label>Пароль <span class="req">*</span></label>
+      <input type="password" id="reg-password" placeholder="Минимум 6 символов" autocomplete="off">
+      <div class="hint">Пароль понадобится для входа.</div>
+
+      <label>Пароль ещё раз <span class="req">*</span></label>
+      <input type="password" id="reg-password2" autocomplete="off">
+
+      <button class="btn" id="reg-btn" onclick="doRegister()">Зарегистрироваться</button>
+      <div class="msg" id="reg-msg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZTqxuRO5vVcZs5Q9MlPbtPK9gEnMlEWFpJpq3FtQsdi_cPR4y/exec';
+const USER_KEY = 'mich_user';
+
+// если уже есть валидный пользователь — сразу на главную
+const existing = JSON.parse(localStorage.getItem(USER_KEY) || 'null');
+if (existing && existing.status === 'approved') {
+  location.replace('index.html');
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg show ' + type;
+}
+
+function jsonp(url, callback) {
+  const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  window[cbName] = (data) => {
+    callback(data);
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+  };
+  const script = document.createElement('script');
+  script.src = url + '&callback=' + cbName;
+  script.onerror = () => callback(null);
+  document.body.appendChild(script);
+  setTimeout(() => { if (window[cbName]) { callback(null); delete window[cbName]; } }, 10000);
+}
+
+/* ---------- ВХОД ---------- */
+function doLogin() {
+  const phone = document.getElementById('login-phone').value.trim();
+  const password = document.getElementById('login-password').value;
+
+  if (!phone || !password) return showMsg('login-msg', 'Заполните телефон и пароль', 'error');
+
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = 'Проверка…';
+
+  const url = `${WEB_APP_URL}?action=login&phone=${encodeURIComponent(phone)}&password=${encodeURIComponent(password)}`;
+  jsonp(url, (data) => {
+    btn.disabled = false;
+    btn.textContent = 'Войти';
+
+    if (!data) return showMsg('login-msg', 'Сервер не отвечает. Попробуйте ещё раз.', 'error');
+
+    if (data.success && data.user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+      showMsg('login-msg', 'Успешно. Переходим…', 'success');
+      setTimeout(() => location.href = 'index.html', 400);
+    } else {
+      const text = data.error || 'Не удалось войти';
+      const type = text.includes('модерации') ? 'info' : 'error';
+      showMsg('login-msg', text, type);
+    }
+  });
+}
+
+/* ---------- РЕГИСТРАЦИЯ ---------- */
+function doRegister() {
+  const bar       = document.getElementById('reg-bar').value;
+  const name      = document.getElementById('reg-name').value.trim();
+  const birthdate = document.getElementById('reg-birthdate').value;
+  const phone     = document.getElementById('reg-phone').value.trim();
+  const telegram  = document.getElementById('reg-telegram').value.trim();
+  const pass1     = document.getElementById('reg-password').value;
+  const pass2     = document.getElementById('reg-password2').value;
+
+  if (!bar)       return showMsg('reg-msg', 'Выберите бар', 'error');
+  if (!name)      return showMsg('reg-msg', 'Введите ФИО', 'error');
+  if (!birthdate) return showMsg('reg-msg', 'Укажите дату рождения', 'error');
+  if (!phone)     return showMsg('reg-msg', 'Введите телефон', 'error');
+  if (pass1.length < 6) return showMsg('reg-msg', 'Пароль — минимум 6 символов', 'error');
+  if (pass1 !== pass2)  return showMsg('reg-msg', 'Пароли не совпадают', 'error');
+
+  const btn = document.getElementById('reg-btn');
+  btn.disabled = true;
+  btn.textContent = 'Отправка…';
+
+  const params = new URLSearchParams({
+    action: 'register',
+    bar, name, birthdate, phone, telegram, password: pass1
+  });
+  const url = `${WEB_APP_URL}?${params.toString()}`;
+
+  jsonp(url, (data) => {
+    btn.disabled = false;
+    btn.textContent = 'Зарегистрироваться';
+
+    if (!data) return showMsg('reg-msg', 'Сервер не отвечает. Попробуйте ещё раз.', 'error');
+
+    if (data.success) {
+      showMsg('reg-msg', '✅ Заявка отправлена. Руководитель подтвердит доступ — после этого сможете войти с этим телефоном и паролем.', 'success');
+      ['reg-name','reg-phone','reg-telegram','reg-password','reg-password2'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('reg-bar').value = '';
+      document.getElementById('reg-birthdate').value = '';
+      setTimeout(() => switchTab('login'), 2500);
+    } else {
+      showMsg('reg-msg', data.error || 'Не удалось зарегистрироваться', 'error');
+    }
+  });
+}
+</script>
+</body>
+</html>
