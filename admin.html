@@ -10,6 +10,8 @@
   .container{max-width:1200px;margin:0 auto}
   h1{font-size:24px;margin-bottom:6px}
   .sub{color:#666;font-size:13.5px;margin-bottom:24px}
+  
+  /* Заглушка пароля (отключена) */
   .lock-screen{background:#fff;padding:40px 32px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.08);max-width:400px;margin:60px auto;text-align:center}
   .lock-screen h2{font-size:20px;margin-bottom:8px}
   .lock-screen p{color:#666;font-size:13.5px;margin-bottom:22px}
@@ -18,6 +20,7 @@
   .lock-screen button{width:100%;padding:14px;margin-top:14px;font-size:15px;font-weight:700;background:#4a90d9;color:#fff;border:none;border-radius:10px;cursor:pointer}
   .lock-screen button:hover{background:#357abd}
   .lock-error{color:#d9534f;font-size:13px;margin-top:10px;height:16px}
+
   .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
   .tab{padding:10px 20px;background:#fff;border:2px solid #d0d7de;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;color:#333;transition:.15s}
   .tab:hover{border-color:#4a90d9}
@@ -59,7 +62,7 @@
 </head>
 <body>
 
-<div id="lockScreen" class="lock-screen">
+<div id="lockScreen" class="lock-screen" style="display:none;">
   <h2>🔐 Панель руководителя</h2>
   <p>Введите пароль руководителя</p>
   <input type="password" id="pwdInput" placeholder="Пароль" onkeydown="if(event.key==='Enter')unlock()">
@@ -67,7 +70,7 @@
   <div class="lock-error" id="lockError"></div>
 </div>
 
-<div id="panel" class="container" style="display:none">
+<div id="panel" class="container">
   <h1>Панель руководителя</h1>
   <div class="sub">Аттестация МиЧ КМ · Gask Bro Group</div>
 
@@ -87,11 +90,14 @@
         <option value="Тест №2">Бармен · Ингредиенты</option>
         <option value="Тест №3">Бармен · Измерения</option>
         <option value="Тест по сервису">Сервис</option>
-       <option value="Тест по алкоголю №1">Алкоголь · История</option>
-<option value="Тест по алкоголю №2">Алкоголь · Вкус</option>
-<option value="Тест по алкоголю №3">Алкоголь · Гостю</option>
-       <option value="Тест · Пиво и сидр">Пиво и сидр</option>
-       <option value="Тест · Настойки">Настойки</option>
+        <option value="Тест по алкоголю №1">Алкоголь · История</option>
+        <option value="Тест по алкоголю №2">Алкоголь · Вкус</option>
+        <option value="Тест по алкоголю №3">Алкоголь · Гостю</option>
+        <option value="Тест · Пиво и сидр">Пиво и сидр</option>
+        <option value="Тест · Настойки">Настойки</option>
+        <option value="Тест · Регламент работы в баре">Регламент работы в баре</option>
+        <option value="Тест · Учёт рабочего времени (УРВ)">Учёт рабочего времени</option>
+        <option value="Тест · Маркировка и хранение настоек">Маркировка настоек</option>
       </select>
       <label>Оценка:</label>
       <select id="filterGrade" onchange="renderTable()">
@@ -133,7 +139,7 @@
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZTqxuRO5vVcZs5Q9MlPbtPK9gEnMlEWFpJpq3FtQsdi_cPR4y/exec';
 let allResults = [];
 
-// Пароль отключён
+// Пароль отключён, панель открывается сразу
 showPanel();
 
 function showPanel() {
@@ -203,20 +209,29 @@ function loadSettings() {
   list.innerHTML = 'Загрузка...';
   jsonp(WEB_APP_URL + '?action=getSettings', (data) => {
     if (!data || !data.settings) { list.innerHTML = 'Ошибка загрузки'; return; }
+    
+    // Полный список всех тестов с их названиями и дефолтным временем
     const names = {
-      'test1.html': 'Тест №1 · Бармен — Метод и посуда',
-      'test2.html': 'Тест №2 · Бармен — Ингредиенты',
-      'test3.html': 'Тест №3 · Бармен — Измерения',
-      'service.html': 'Тест · Сервис'
-     'beer1.html': 'Тест · Пиво и сидр'
-   'tincture1.html': 'Тест · Настойки'
+      'test1.html': { name: 'Тест №1 · Бармен — Метод и посуда', time: 20 },
+      'test2.html': { name: 'Тест №2 · Бармен — Ингредиенты', time: 20 },
+      'test3.html': { name: 'Тест №3 · Бармен — Измерения', time: 20 },
+      'service.html': { name: 'Тест · Сервис', time: 20 },
+      'alco1.html': { name: 'Тест по алкоголю №1 · История', time: 20 },
+      'alco2.html': { name: 'Тест по алкоголю №2 · Вкус', time: 20 },
+      'alco3.html': { name: 'Тест по алкоголю №3 · Гостю', time: 20 },
+      'beer1.html': { name: 'Тест · Пиво и сидр', time: 10 },
+      'tincture1.html': { name: 'Тест · Настойки', time: 10 },
+      'reg-bar-test.html': { name: 'Тест · Регламент работы в баре', time: 10 },
+      'reg-urv-test.html': { name: 'Тест · Учёт рабочего времени', time: 10 },
+      'reg-tincture-test.html': { name: 'Тест · Маркировка настоек', time: 10 }
     };
+    
     let html = '';
     Object.keys(names).forEach(key => {
-      const min = data.settings[key] || 15;
+      const min = data.settings[key] || names[key].time;
       html += `
         <div class="setting-row">
-          <label>${names[key]}</label>
+          <label>${names[key].name}</label>
           <div>
             <input type="number" id="set_${key}" value="${min}" min="1" max="180">
             <button onclick="saveSetting('${key}')">Сохранить</button>
