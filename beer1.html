@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Аттестация МиЧ КМ — Тест · Пиво и сидр</title>
+<style>
+  *{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;max-width:920px;margin:0 auto;padding:20px;background:#f0f2f5;color:#1a1a1a}
+  h1{text-align:center;font-size:22px;margin:10px 0 4px}.test-label{text-align:center;font-size:16px;font-weight:700;color:#c17d1a;margin-bottom:6px}.subtitle{text-align:center;color:#666;font-size:13px;margin-bottom:20px}
+  .name-block{background:#fff;padding:20px;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:18px}
+  .name-block label{display:block;font-weight:600;font-size:15px;margin-bottom:8px}
+  .name-block input{width:100%;padding:12px 14px;font-size:15px;border:2px solid #d0d7de;border-radius:8px;outline:none}
+  .name-block input:focus{border-color:#c17d1a}
+  .name-block .hint{font-size:12px;color:#888;margin-top:6px}
+  .name-block .start-btn{display:block;width:100%;padding:14px;margin-top:14px;font-size:15px;font-weight:700;background:#c17d1a;color:#fff;border:none;border-radius:10px;cursor:pointer}
+  .name-block .start-btn:hover{background:#a0650e}
+  .progress{text-align:center;font-size:14px;color:#555;margin-bottom:16px;font-weight:600}
+  .question{background:#fff;padding:16px 20px;margin-bottom:12px;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .question h3{margin:0 0 10px;font-size:15px;font-weight:600;line-height:1.4}
+  .option{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;margin:4px 0;border-radius:8px;cursor:pointer;font-size:14px;line-height:1.35;transition:background .12s}
+  .option:hover{background:#fdf3e3}.option input{margin-top:3px;flex-shrink:0}
+  .option.locked{cursor:default}.option.locked:hover{background:transparent}
+  .option.correct{background:#d4edda}.option.wrong{background:#f8d7da}
+  .option.correct.locked:hover{background:#d4edda}.option.wrong.locked:hover{background:#f8d7da}
+  .btn{display:block;margin:24px auto 8px;padding:15px 44px;font-size:17px;font-weight:700;background:#c17d1a;color:#fff;border:none;border-radius:10px;cursor:pointer}
+  .btn:hover{background:#a0650e}.btn.secondary{background:#6c757d;font-size:14px;padding:10px 24px}.btn.secondary:hover{background:#565e64}
+  .result{text-align:center;font-size:19px;font-weight:700;margin:16px 0 30px;padding:20px;border-radius:10px}
+  .result.pass{background:#d4edda;color:#155724}.result.fail{background:#f8d7da;color:#721c24}
+  .result small{display:block;font-size:13px;font-weight:400;margin-top:6px;opacity:.85}
+  .note{background:#fff8e1;border-left:4px solid #ffc107;padding:12px 16px;border-radius:8px;font-size:13px;color:#5c4a00;margin-bottom:18px;line-height:1.5}
+  .warning{background:#fff3cd;border:1px solid #ffc107;color:#664d03;padding:10px 14px;border-radius:8px;font-size:14px;margin-bottom:12px;display:none;text-align:center}
+  .warning.show{display:block}
+  #timerBox{position:fixed;top:14px;right:14px;background:#c17d1a;color:#fff;padding:10px 18px;border-radius:12px;font-weight:700;font-size:17px;box-shadow:0 4px 14px rgba(0,0,0,.2);z-index:50;display:none;font-variant-numeric:tabular-nums}
+  #timerBox.warn{background:#f0ad4e}
+  #timerBox.danger{background:#d9534f;animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
+  @media (max-width:600px){body{padding:12px}.question{padding:12px 14px}#timerBox{top:8px;right:8px;padding:8px 14px;font-size:15px}}
+</style>
+</head>
+<body>
+
+<div id="timerBox">⏱ <span id="timerText">10:00</span></div>
+
+<h1>Аттестация МиЧ КМ (Бармен)</h1>
+<div class="test-label">Тест · Пиво и сидр</div>
+<div class="subtitle">Пиво · Сидр · Подача · 25 вопросов · 10 минут</div>
+
+<div class="note">
+  <b>Инструкция:</b> укажите ФИО и нажмите «Начать тест». Отметьте один ответ в каждом вопросе и нажмите «Сдать тест».
+  По истечении времени тест сдаётся автоматически. Оценка: 90–100% — «5», 75–89% — «4», 60–74% — «3», менее 60% — «2».
+</div>
+
+<div class="name-block" id="nameBlock">
+  <label for="userName">ФИО сотрудника <span style="color:#d9534f">*</span></label>
+  <input type="text" id="userName" placeholder="Иванов Иван Иванович" autocomplete="off">
+  <div class="hint">Укажите полное имя — оно будет указано в отчёте.</div>
+  <button class="start-btn" onclick="startTest()">▶ Начать тест</button>
+</div>
+
+<div class="progress" id="progress" style="display:none">Отвечено: 0 из 25</div>
+<div class="warning" id="warning"></div>
+<div id="testBox"></div>
+<div id="result" class="result" style="display:none"></div>
+
+<script>
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZTqxuRO5vVcZs5Q9MlPbtPK9gEnMlEWFpJpq3FtQsdi_cPR4y/exec';
+const TEST_NAME = 'Тест · Пиво и сидр';
+const TEST_FILE = 'beer1.html';
+
+const Q = [
+{q:"Из каких четырёх основных ингредиентов делают пиво?",o:["Вода, солод, хмель, дрожжи","Вода, сахар, дрожжи, хмель","Солод, рис, вода, хмель","Вода, виноград, дрожжи, солод"],a:0},
+{q:"Что означает показатель ABV на этикетке пива?",o:["Горечь пива","Крепость пива в процентах","Плотность сусла","Срок хранения"],a:1},
+{q:"Что означает показатель IBU?",o:["Крепость пива","Плотность сусла","Горечь пива","Температура подачи"],a:2},
+{q:"Что означает показатель OG или плотность в °P?",o:["Горечь пива","Крепость пива","Температура брожения","Насыщенность сусла перед брожением"],a:3},
+{q:"Какие дрожжи используются для эля?",o:["Дрожжи верхового брожения","Дрожжи низового брожения","Спонтанное брожение","Синтетические дрожжи"],a:0},
+{q:"Какая температура брожения у эля?",o:["Примерно 7–13 °С","Примерно 15–24 °С","Примерно 25–30 °С","Примерно 0–5 °С"],a:1},
+{q:"Какая температура брожения у лагера?",o:["Примерно 15–24 °С","Примерно 25–30 °С","Примерно 7–13 °С","Примерно 0–5 °С"],a:2},
+{q:"Верно ли, что цвет пива напрямую определяет его крепость и горечь?",o:["Да, всегда","Да, кроме стаутов","Нет, только для лагеров","Нет, цвет не равен крепости и горечи"],a:3},
+{q:"Какие вкусовые характеристики у пшеничного пива (Weissbier)?",o:["Мутное, с пышной пеной, банан и гвоздика от дрожжей","Прозрачное, с выраженной горечью","Тёмное, с кофейными нотами","Сладкое, с ягодными нотами"],a:0},
+{q:"Что характерно для ирландского сухого стаута?",o:["Высокая крепость и сладость","Лёгкая крепость и сухая горчинка","Фруктовый аромат и кислинка","Мутность и пшеничный вкус"],a:1},
+{q:"Какие ноты характерны для IPA и пейл-эля?",o:["Банановые и гвоздичные","Кофейные и шоколадные","Хмелевые, цитрус, смола, тропики","Яблочные и грушевые"],a:2},
+{q:"Из чего делают сидр?",o:["Из сброженного виноградного сока","Из сброженного ячменного солода","Из сброженного сока из тростника","Из сброженного яблочного сока, иногда с грушей"],a:3},
+{q:"Какая типичная крепость сидра?",o:["Обычно 4–7%","Обычно 8–12%","Обычно 1–3%","Обычно 15–20%"],a:0},
+{q:"При какой температуре подают сидр?",o:["4–6 °С","6–10 °С","12–15 °С","18–20 °С"],a:1},
+{q:"Какая температура подачи лагеров и пшеничного?",o:["2–4 °С","10–12 °С","4–8 °С","8–12 °С"],a:2},
+{q:"Какая температура подачи элей и стаутов?",o:["4–8 °С","2–4 °С","12–15 °С","8–12 °С"],a:3},
+{q:"В какой посуде подают пшеничное пиво?",o:["В высоком бокале-вазе","В шоте","В кружке-пинте","В вином бокале на ножке"],a:0},
+{q:"В какой посуде подают фруктовое пиво и сидр?",o:["В пивной кружке","В тюльпане или бокале на ножке","В высоком бокале-вазе","В шоте"],a:1},
+{q:"Как правильно наливать пиво из крана?",o:["Держать бокал вертикально и не касаться краном стекла","Наливать быстро в холодный бокал","Держать бокал под углом 45°, не касаясь краном стекла, затем выпрямлять","Наливать только в сухой бокал"],a:2},
+{q:"Через какой кран наливают азотные стаут и лагер?",o:["Через обычный лагерный кран","Через краник для сидра","Через пивной насос","Через стаут-кран"],a:3},
+{q:"Что происходит, если линии для розлива пива давно не промывали?",o:["Появляется кислинка, затхлость, масляный привкус (диацетил)","Пиво становится крепче","Пиво становится прозрачнее","Пиво становится слаще"],a:0},
+{q:"Как часто обычно промывают линии для розлива пива?",o:["Раз в день","Раз в 1–2 недели","Раз в месяц","Раз в год"],a:1},
+{q:"Что означает «картонный привкус» в пиве?",o:["Инфекция в линии","Недобродившее пиво","Окисление: пиво старое или хранилось на свету и в тепле","Слишком холодная подача"],a:2},
+{q:"Кому принадлежат бренды Baden Bier и Black Sheep в меню бара?",o:["Британской пивоварне Black Sheep Brewery","Импортному поставщику из Баварии","Немецкой компании Heineken","Российской компании «Объединённые пивоварни — Холдинг»"],a:3},
+{q:"Что сказать гостю про Black Sheep Irish Stout?",o:["Тёмное пиво в ирландском стиле, лёгкое по крепости (4%), с кремовой пеной","Крепкий импортный стаут из Англии","Сладкое фруктовое пиво","Пшеничное нефильтрованное пиво"],a:0}
+];
+
+let submitted = false, testStarted = false, secondsLeft = 0, timerInterval = null, TEST_TIME_MIN = 10, userName = '';
+
+function render() {
+  const box = document.getElementById('testBox');
+  let html = '';
+  Q.forEach((q, i) => {
+    html += `<div class="question" id="q${i}" style="display:none"><h3>${i + 1}. ${q.q}</h3>`;
+    q.o.forEach((opt, j) => {
+      html += `<label class="option" id="q${i}o${j}"><input type="radio" name="q${i}" value="${j}" onchange="updateProgress()"><span>${opt}</span></label>`;
+    });
+    html += `</div>`;
+  });
+  html += `<button class="btn" id="submitBtn" onclick="submit(false)" style="display:none">Сдать тест</button>
+           <button class="btn secondary" id="resetBtn" style="display:none" onclick="reset()">Пройти заново</button>`;
+  box.innerHTML = html;
+}
+
+function startTest() {
+  const name = document.getElementById('userName').value.trim();
+  if (name.length < 3) {
+    const w = document.getElementById('warning');
+    w.textContent = 'Укажите ФИО сотрудника (минимум 3 символа).';
+    w.classList.add('show');
+    document.getElementById('userName').focus();
+    return;
+  }
+  userName = name;
+  testStarted = true;
+  document.getElementById('nameBlock').style.display = 'none';
+  document.getElementById('progress').style.display = 'block';
+  document.getElementById('submitBtn').style.display = 'block';
+  document.querySelectorAll('.question').forEach(el => el.style.display = 'block');
+  document.getElementById('warning').classList.remove('show');
+  loadTimerSetting();
+}
+
+function loadTimerSetting() {
+  jsonp(WEB_APP_URL + '?action=getSettings', (data) => {
+    if (data && data.settings && data.settings[TEST_FILE]) {
+      TEST_TIME_MIN = parseInt(data.settings[TEST_FILE]) || 10;
+    }
+    startTimer();
+  });
+}
+
+function startTimer() {
+  secondsLeft = TEST_TIME_MIN * 60;
+  updateTimerDisplay();
+  document.getElementById('timerBox').style.display = 'block';
+  timerInterval = setInterval(() => {
+    secondsLeft--;
+    updateTimerDisplay();
+    if (secondsLeft <= 0) { clearInterval(timerInterval); submit(true); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const min = Math.floor(secondsLeft / 60);
+  const sec = secondsLeft % 60;
+  document.getElementById('timerText').textContent = String(min).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+  const box = document.getElementById('timerBox');
+  box.classList.remove('warn', 'danger');
+  if (secondsLeft <= 60) box.classList.add('danger');
+  else if (secondsLeft <= 180) box.classList.add('warn');
+}
+
+function updateProgress() {
+  if (submitted) return;
+  let answered = 0;
+  Q.forEach((q, i) => { if (document.querySelector(`input[name="q${i}"]:checked`)) answered++; });
+  document.getElementById('progress').textContent = `Отвечено: ${answered} из ${Q.length}`;
+  document.getElementById('warning').classList.remove('show');
+}
+
+function submit(isAuto) {
+  if (submitted || !testStarted) return;
+  if (!isAuto) {
+    let unanswered = 0;
+    Q.forEach((q, i) => { if (!document.querySelector(`input[name="q${i}"]:checked`)) unanswered++; });
+    if (unanswered > 0) {
+      const w = document.getElementById('warning');
+      w.textContent = `Ответьте на все вопросы. Осталось: ${unanswered}.`;
+      w.classList.add('show');
+      w.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    if (!confirm('Сдать тест? После этого изменить ответы будет нельзя.')) return;
+  } else {
+    alert('⏰ Время истекло! Тест сдан автоматически.');
+  }
+
+  if (timerInterval) clearInterval(timerInterval);
+  document.getElementById('timerBox').style.display = 'none';
+
+  let score = 0;
+  const details = [];
+  Q.forEach((q, i) => {
+    const qDiv = document.getElementById(`q${i}`);
+    const selected = qDiv.querySelector('input:checked');
+    const userAns = selected ? +selected.value : -1;
+    const isCorrect = userAns === q.a;
+    if (isCorrect) score++;
+    details.push(`${i + 1}. ${q.q}\nОтвет: ${userAns >= 0 ? q.o[userAns] : '—'}\nПравильный: ${q.o[q.a]}\n${isCorrect ? '✅ Верно' : '❌ Ошибка'}`);
+    q.o.forEach((opt, j) => {
+      const optLabel = document.getElementById(`q${i}o${j}`);
+      optLabel.querySelector('input').disabled = true;
+      optLabel.classList.add('locked');
+      if (j === q.a) optLabel.classList.add('correct');
+      if (userAns === j && j !== q.a) optLabel.classList.add('wrong');
+    });
+  });
+  submitted = true;
+
+  const total = Q.length;
+  const pct = Math.round((score / total) * 100);
+  let grade;
+  if (pct >= 90) grade = 5;
+  else if (pct >= 75) grade = 4;
+  else if (pct >= 60) grade = 3;
+  else grade = 2;
+
+  const payload = {
+    name: userName, testName: TEST_NAME,
+    score: `${score} из ${total}`,
+    pct, grade,
+    date: new Date().toLocaleString('ru-RU'),
+    details: details.join('\n\n')
+  };
+  fetch(WEB_APP_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(err => console.error('Ошибка отправки:', err));
+
+  const res = document.getElementById('result');
+  res.style.display = 'block';
+  res.className = 'result ' + (pct >= 60 ? 'pass' : 'fail');
+  res.innerHTML = `Результат: ${score} из ${total} (${pct}%) — оценка «${grade}»<small>${isAuto ? '⏰ Тест сдан автоматически. ' : ''}Результат отправлен руководителю.</small>`;
+
+  document.getElementById('submitBtn').style.display = 'none';
+  document.getElementById('resetBtn').style.display = 'block';
+  document.getElementById('progress').textContent = `Отвечено: ${total} из ${total} · Тест сдан`;
+  res.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function reset() {
+  submitted = false; testStarted = false;
+  if (timerInterval) clearInterval(timerInterval);
+  document.getElementById('timerBox').style.display = 'none';
+  document.getElementById('userName').value = '';
+  document.getElementById('nameBlock').style.display = 'block';
+  document.getElementById('progress').style.display = 'none';
+  document.getElementById('submitBtn').style.display = 'none';
+  document.getElementById('resetBtn').style.display = 'none';
+  document.querySelectorAll('.question').forEach(el => el.style.display = 'none');
+  Q.forEach((q, i) => {
+    const qDiv = document.getElementById(`q${i}`);
+    qDiv.querySelectorAll('input').forEach(inp => { inp.checked = false; inp.disabled = false; });
+    qDiv.querySelectorAll('.option').forEach(opt => opt.classList.remove('correct', 'wrong', 'locked'));
+  });
+  const res = document.getElementById('result');
+  res.style.display = 'none'; res.innerHTML = '';
+  document.getElementById('warning').classList.remove('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function jsonp(url, callback) {
+  const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  window[cbName] = (data) => {
+    callback(data);
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+  };
+  const script = document.createElement('script');
+  script.src = url + '&callback=' + cbName;
+  script.onerror = () => callback(null);
+  document.body.appendChild(script);
+  setTimeout(() => { if (window[cbName]) { callback(null); delete window[cbName]; } }, 8000);
+}
+
+render();
+</script>
+</body>
+</html>
