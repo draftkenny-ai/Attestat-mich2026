@@ -7,7 +7,7 @@
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:#f0f2f5;color:#1a1a1a;padding:20px}
-  .container{max-width:1200px;margin:0 auto}
+  .container{max-width:1400px;margin:0 auto} /* Увеличили ширину контейнера */
   h1{font-size:24px;margin-bottom:6px}
   .sub{color:#666;font-size:13.5px;margin-bottom:24px}
   
@@ -177,8 +177,9 @@
       <div style="font-size: 14px; color: #666;">Отметьте галочками темы, к которым у сотрудника есть доступ.</div>
       <button onclick="loadAccesses()">🔄 Обновить</button>
     </div>
-    <div style="overflow-x: auto; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08);">
-      <table id="accessTable" style="white-space: nowrap; min-width: 100%; border-collapse: collapse;">
+    <div style="overflow-x: auto; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); width: 100%;">
+      <!-- Убрали white-space: nowrap, чтобы текст переносился -->
+      <table id="accessTable" style="width: 100%; border-collapse: collapse; table-layout: auto;">
         <thead id="accessHead"></thead>
         <tbody id="accessBody"></tbody>
       </table>
@@ -431,27 +432,45 @@ function editUserName(userId, currentName) {
 }
 
 /* ============================================================
-   МАТРИЦА ДОСТУПОВ
+   МАТРИЦА ДОСТУПОВ (Обновленная)
    ============================================================ */
 const TOPICS_LECTURES = [
-  { id: 'lec_service', name: 'Сервис' }, { id: 'lec_beer', name: 'Пиво' }, { id: 'lec_tincture', name: 'Настойки' },
-  { id: 'lec_alco_hist', name: 'Алкоголь (Ист)' }, { id: 'lec_alco_ref', name: 'Алкоголь (Спр)' },
-  { id: 'lec_reg_bar', name: 'Рег (Бар)' }, { id: 'lec_reg_urv', name: 'Рег (УРВ)' }, { id: 'lec_reg_tincture', name: 'Рег (Наст)' }
+  { id: 'lec_service', name: 'Сервис' }, 
+  { id: 'lec_beer', name: 'Пиво' }, 
+  { id: 'lec_tincture', name: 'Настойки' },
+  { id: 'lec_alco_hist', name: 'Алко (Ист)' }, 
+  { id: 'lec_alco_ref', name: 'Алко (Спр)' },
+  { id: 'lec_reg_bar', name: 'Рег (Бар)' }, 
+  { id: 'lec_reg_urv', name: 'Рег (УРВ)' }, 
+  { id: 'lec_reg_tincture', name: 'Рег (Наст)' }
 ];
+
 const TOPICS_TESTS = [
-  { id: 'test1', name: 'Тест 1' }, { id: 'test2', name: 'Тест 2' }, { id: 'test3', name: 'Тест 3' }, { id: 'service', name: 'Сервис' },
-  { id: 'alco1', name: 'Алко 1' }, { id: 'alco2', name: 'Алко 2' }, { id: 'alco3', name: 'Алко 3' },
-  { id: 'beer1', name: 'Пиво' }, { id: 'tincture1', name: 'Настойки' },
-  { id: 'reg-bar-test', name: 'Рег (Бар)' }, { id: 'reg-urv-test', name: 'Рег (УРВ)' }, { id: 'reg-tincture-test', name: 'Рег (Наст)' },
-  { id: 'final-attestation', name: 'Итоговая' }
+  { id: 'test1', name: 'Метод и посуда' }, 
+  { id: 'test2', name: 'Ингредиенты' }, 
+  { id: 'test3', name: 'Измерения' }, 
+  { id: 'service', name: 'Сервис' },
+  { id: 'alco1', name: 'Алко 1 (Ист)' }, 
+  { id: 'alco2', name: 'Алко 2 (Вкус)' }, 
+  { id: 'alco3', name: 'Алко 3 (Гостю)' },
+  { id: 'beer1', name: 'Пиво' }, 
+  { id: 'tincture1', name: 'Настойки' }
 ];
+
+const TOPICS_REGS = [
+  { id: 'reg-bar-test', name: 'Бар' },
+  { id: 'reg-urv-test', name: 'УРВ' },
+  { id: 'reg-tincture-test', name: 'Настойки' },
+  { id: 'final-attestation', name: '🎓 Итоговая' }
+];
+
 let accessUsers = [];
 
 function loadAccesses() {
-  document.getElementById('accessBody').innerHTML = '<tr><td colspan="20" class="empty">Загрузка...</td></tr>';
+  document.getElementById('accessBody').innerHTML = '<tr><td colspan="24" class="empty">Загрузка...</td></tr>';
   jsonp(WEB_APP_URL + '?action=getUsers&pwd=' + encodeURIComponent(currentPwd), (data) => {
     if (!data || data.error) {
-      document.getElementById('accessBody').innerHTML = '<tr><td colspan="20" class="empty">Ошибка загрузки</td></tr>';
+      document.getElementById('accessBody').innerHTML = '<tr><td colspan="24" class="empty">Ошибка загрузки</td></tr>';
       return;
     }
     accessUsers = data.users.filter(u => u.status === 'approved');
@@ -460,20 +479,33 @@ function loadAccesses() {
 }
 
 function renderAccessTable() {
+  // Стили для шапки
+  const thStyle = "font-size: 11px; font-weight: 700; padding: 8px 4px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2); vertical-align: bottom;";
+  const tdStyle = "padding: 4px 2px; text-align: center; border-right: 1px solid #eee; width: 30px;";
+  
   let headHtml = `<tr>
-    <th style="position:sticky; left:0; background:#4a90d9; z-index:2; min-width:120px;">Бар</th>
-    <th style="position:sticky; left:120px; background:#4a90d9; z-index:2; min-width:180px;">ФИО</th>
-    <th colspan="${TOPICS_LECTURES.length}" style="text-align:center; background:#357abd; border-left:2px solid #fff;">📖 Лекции</th>
-    <th colspan="${TOPICS_TESTS.length}" style="text-align:center; background:#2c5f8d; border-left:2px solid #fff;">📝 Тесты</th>
-    <th style="background:#28a745; text-align:center;">Сохр.</th>
+    <th rowspan="2" style="position:sticky; left:0; background:#4a90d9; z-index:2; min-width:80px; padding: 8px;">Бар</th>
+    <th rowspan="2" style="position:sticky; left:80px; background:#4a90d9; z-index:2; min-width:160px; padding: 8px; text-align: left;">ФИО</th>
+    <th colspan="${TOPICS_LECTURES.length}" style="text-align:center; background:#357abd; border-left:2px solid #fff; padding: 8px;">📖 Лекции</th>
+    <th colspan="${TOPICS_TESTS.length}" style="text-align:center; background:#2c5f8d; border-left:2px solid #fff; padding: 8px;">📝 Тесты</th>
+    <th colspan="${TOPICS_REGS.length}" style="text-align:center; background:#1e466b; border-left:2px solid #fff; padding: 8px;">📋 Регламенты</th>
+    <th rowspan="2" style="background:#28a745; text-align:center; min-width:50px; padding: 8px;">Сохр.</th>
   </tr><tr>`;
-  TOPICS_LECTURES.forEach(t => headHtml += `<th style="font-size:11px; text-align:center; background:#4a90d9; border-left:1px solid #6ba3e0;" title="${t.name}">${t.name.split(' ')[0]}</th>`);
-  TOPICS_TESTS.forEach(t => headHtml += `<th style="font-size:11px; text-align:center; background:#4a90d9; border-left:1px solid #6ba3e0;" title="${t.name}">${t.name.split(' ')[0]}</th>`);
-  headHtml += `<th></th></tr>`;
+
+  // Рендер заголовков колонок (с переносом слов)
+  const renderTh = (topic, color) => `
+    <th style="background:${color}; ${thStyle}" title="${topic.name}">
+      <div style="word-wrap: break-word; max-width: 45px; margin: 0 auto; line-height: 1.2;">${topic.name}</div>
+    </th>`;
+
+  TOPICS_LECTURES.forEach(t => headHtml += renderTh(t, '#4a90d9'));
+  TOPICS_TESTS.forEach(t => headHtml += renderTh(t, '#4a90d9'));
+  TOPICS_REGS.forEach(t => headHtml += renderTh(t, '#4a90d9'));
+  headHtml += `</tr>`;
   document.getElementById('accessHead').innerHTML = headHtml;
 
   if (!accessUsers.length) {
-    document.getElementById('accessBody').innerHTML = '<tr><td colspan="30" class="empty">Нет одобренных пользователей</td></tr>';
+    document.getElementById('accessBody').innerHTML = '<tr><td colspan="24" class="empty">Нет одобренных пользователей</td></tr>';
     return;
   }
 
@@ -481,18 +513,21 @@ function renderAccessTable() {
   accessUsers.forEach(u => {
     let accessObj = {};
     try { accessObj = u.access ? JSON.parse(u.access) : { all: true }; } catch(e) { accessObj = { all: true }; }
+    
     bodyHtml += `<tr>
-      <td style="position:sticky; left:0; background:#fff; z-index:1; font-weight:600;">${u.bar}</td>
-      <td style="position:sticky; left:120px; background:#fff; z-index:1; border-right:1px solid #ddd;">${u.name}</td>`;
-    TOPICS_LECTURES.forEach(t => {
+      <td style="position:sticky; left:0; background:#fff; z-index:1; font-weight:600; padding: 8px;">${u.bar}</td>
+      <td style="position:sticky; left:80px; background:#fff; z-index:1; border-right:1px solid #ddd; padding: 8px;">${u.name}</td>`;
+      
+    const renderTd = (t) => {
       const checked = accessObj.all || accessObj[t.id] ? 'checked' : '';
-      bodyHtml += `<td style="text-align:center;"><input type="checkbox" class="access-cb" data-user="${u.id}" data-topic="${t.id}" ${checked}></td>`;
-    });
-    TOPICS_TESTS.forEach(t => {
-      const checked = accessObj.all || accessObj[t.id] ? 'checked' : '';
-      bodyHtml += `<td style="text-align:center;"><input type="checkbox" class="access-cb" data-user="${u.id}" data-topic="${t.id}" ${checked}></td>`;
-    });
-    bodyHtml += `<td style="text-align:center;"><button onclick="saveUserAccess('${u.id}')" style="padding:6px 12px; background:#28a745; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700;">💾</button></td></tr>`;
+      return `<td style="${tdStyle}"><input type="checkbox" class="access-cb" data-user="${u.id}" data-topic="${t.id}" ${checked}></td>`;
+    };
+
+    TOPICS_LECTURES.forEach(t => bodyHtml += renderTd(t));
+    TOPICS_TESTS.forEach(t => bodyHtml += renderTd(t));
+    TOPICS_REGS.forEach(t => bodyHtml += renderTd(t));
+
+    bodyHtml += `<td style="text-align:center; padding: 4px;"><button onclick="saveUserAccess('${u.id}')" style="padding:6px 10px; background:#28a745; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700;">💾</button></td></tr>`;
   });
   document.getElementById('accessBody').innerHTML = bodyHtml;
 }
@@ -501,6 +536,7 @@ function saveUserAccess(userId) {
   const checkboxes = document.querySelectorAll(`.access-cb[data-user="${userId}"]`);
   const accessObj = {};
   checkboxes.forEach(cb => { if (cb.checked) accessObj[cb.dataset.topic] = true; });
+  
   const jsonStr = JSON.stringify(accessObj);
   const url = WEB_APP_URL + '?action=saveUserAccess&pwd=' + encodeURIComponent(currentPwd) + '&userId=' + encodeURIComponent(userId) + '&access=' + encodeURIComponent(jsonStr);
   jsonp(url, (data) => {
