@@ -10,63 +10,120 @@
   // На этих страницах auth.js молчит
   if (isRegisterPage || isAdminPage) return;
 
+  // 1. СКРЫВАЕМ СТРАНИЦУ, пока не проверим доступ на сервере
+  document.documentElement.style.display = 'none';
+
   const user = JSON.parse(localStorage.getItem(KEY) || 'null');
 
-  // Нет пользователя или он не одобрен → на регистрацию
+  // 2. Если в браузере нет данных или статус не approved → сразу на регистрацию
   if (!user || user.status !== 'approved') {
-    sessionStorage.setItem('mich_redirect', page);
+    localStorage.removeItem(KEY);
     location.replace('register.html');
     return;
   }
 
-  window.MICH_USER = user;
+  // 3. Проверяем статус на сервере (ждем ответа, только потом показываем страницу)
+  const cbName = 'cb_auth_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  window[cbName] = (data) => {
+    delete window[cbName];
+    
+    if (data && data.valid) {
+      // СЕССИЯ ВАЛИДНА -> показываем страницу
+      document.documentElement.style.display = 'block';
+      initPage(user);
+    } else {
+      // СЕССИЯ НЕВАЛИДНА (заблокирован) -> выкидываем
+      localStorage.removeItem(KEY);
+      location.replace('register.html');
+    }
+  };
 
-  // Фоновая проверка токена (на случай блокировки)
-  (function backgroundCheck() {
-    const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    window[cbName] = (data) => {
-      delete window[cbName];
-      if (!data || !data.valid) {
-        localStorage.removeItem(KEY);
-        location.replace('register.html');
+  const s = document.createElement('script');
+  s.src = `${WEB_APP_URL}?action=checkSession&userId=${encodeURIComponent(user.id)}&token=${encodeURIComponent(user.token)}&callback=${cbName}`;
+  s.onerror = () => {
+    // Если скрипт недоступен (нет интернета) — не пускаем
+    localStorage.removeItem(KEY);
+    location.replace('register.html');
+  };
+  document.body.appendChild(s);
+
+  function initPage(user) {
+    window.MICH_USER = user;
+
+    // Проверка доступа к тестам
+    const testPages = ['test1.html','test2.html','test3.html','service.html','alco1.html','alco2.html','alco3.html','beer1.html','tincture1.html','reg-bar-test.html','reg-urv-test.html','reg-tincture-test.html','final-attestation.html'];
+    
+    if (testPages.includes(page)) {
+      const topicId = page.replace('.html', '');
+      let hasAccess = false;
+      
+      if (!user.access || user.access.all) hasAccess = true;
+      else if (user.access[topicId] === true) hasAccess = true;
+
+      if (!hasAccess) {
+        alert('⛔ У вас нет доступа к этому тесту. Обратитесь к руководителю.');
+        location.replace('index.html');
+        return;
       }
-    };
-    const s = document.createElement('script');
-    s.src = `${WEB_APP_URL}?action=checkSession&userId=${encodeURIComponent(user.id)}&token=${encodeURIComponent(user.token)}&callback=${cbName}`;
-    s.onerror = () => {};
-    document.body.appendChild(s);
-  })();
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // Автозаполнение ФИО в тестах
-    const nameInput = document.getElementById('userName');
-    if (nameInput) {
-      nameInput.value = user.name;
-      nameInput.readOnly = true;
-      nameInput.style.background = '#f0f2f5';
-      nameInput.style.cursor = 'not-allowed';
-      nameInput.title = 'ФИО подставляется из аккаунта. Изменить может только руководитель.';
-
-      // Скрыть подсказку про "укажите полное имя"
-      const hint = nameInput.parentElement.querySelector('.hint');
-      if (hint) hint.textContent = `Вы вошли как ${user.name} · ${user.bar || ''}`;
     }
 
-    // Плавашка «Привет + Выйти»
-    const badge = document.createElement('div');
-    badge.style.cssText =
-      'position:fixed;top:12px;right:12px;background:#fff;padding:8px 14px;border-radius:10px;' +
-      'box-shadow:0 2px 10px rgba(0,0,0,.12);font-size:13px;z-index:9999;' +
-      'display:flex;gap:10px;align-items:center;font-family:-apple-system,Segoe UI,Roboto,sans-serif';
-    badge.innerHTML = `
-      <span>👤 <b>${user.name.split(' ')[0]}</b></span>
-      <button id="mich-logout" style="padding:5px 10px;background:#f0f2f5;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Выйти</button>
-    `;
-    document.body.appendChild(badge);
-    document.getElementById('mich-logout').onclick = () => {
-      if (!confirm('Выйти из аккаунта?')) return;
-      localStorage.removeItem(KEY);
-      location.href = 'register.html';
-    };
-  });
+    document.addEventListener('DOMContentLoaded', () => {
+      // Автозаполнение ФИО в тестах
+      const nameInput = document.getElementById('userName');
+      if (nameInput) {
+        nameInput.value = user.name;
+        nameInput.readOnly = true;
+        nameInput.style.background = '#f0f2f5';
+        nameInput.style.cursor = 'not-allowed';
+        nameInput.title = 'ФИО подставляется из аккаунта. Изменить может только руководитель.';
+        const hint = nameInput.parentElement.querySelector('.hint');
+        if (hint) hint.textContent = `Вы вошли как ${user.name} · ${user.bar || ''}`;
+      }
+
+      // Плавашка «Привет + Выйти»
+      const badge = document.createElement('div');
+      badge.style.cssText =
+        'position:fixed;top:12px;right:12px;background:#fff;padding:8px 14px;border-radius:10px;' +
+        'box-shadow:0 2px 10px rgba(0,0,0,.12);font-size:13px;z-index:9999;' +
+        'display:flex;gap:10px;align-items:center;font-family:-apple-system,Segoe UI,Roboto,sans-serif';
+      badge.innerHTML = `
+        <span>👤 <b>${user.name.split(' ')[0]}</b></span>
+        <button id="mich-logout" style="padding:5px 10px;background:#f0f2f5;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Выйти</button>
+      `;
+      document.body.appendChild(badge);
+      document.getElementById('mich-logout').onclick = () => {
+        if (!confirm('Выйти из аккаунта?')) return;
+        localStorage.removeItem(KEY);
+        location.href = 'register.html';
+      };
+
+      // Скрытие тем на главной странице
+      if (page === 'index.html' || page === '') {
+        const allCards = document.querySelectorAll('a.card');
+        allCards.forEach(card => {
+          const href = card.getAttribute('href');
+          if (!href) return;
+          const topicId = href.replace('.html', '');
+          
+          if (testPages.includes(href)) {
+            let hasAccess = false;
+            if (!user.access || user.access.all) hasAccess = true;
+            else if (user.access[topicId] === true) hasAccess = true;
+
+            if (!hasAccess) {
+              card.style.opacity = '0.5';
+              card.style.pointerEvents = 'none';
+              card.style.filter = 'grayscale(1)';
+              const badge = card.querySelector('.timer-badge');
+              if (badge) {
+                badge.textContent = '🔒 Нет доступа';
+                badge.style.background = '#fee2e2';
+                badge.style.color = '#991b1b';
+              }
+            }
+          }
+        });
+      }
+    });
+  }
 })();
