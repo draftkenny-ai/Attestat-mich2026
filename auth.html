@@ -9,50 +9,58 @@
 
   if (isRegisterPage || isAdminPage) return;
 
-  // Защита от кэша браузера (кнопка "Назад")
-  window.addEventListener('pageshow', (event) => {
-    if (event.persisted) location.reload(); 
-  });
-
+  // 1. СКРЫВАЕМ СТРАНИЦУ
   document.documentElement.style.display = 'none';
-  const user = JSON.parse(localStorage.getItem(KEY) || 'null');
+
+  let user = null;
+  try {
+    user = JSON.parse(localStorage.getItem(KEY) || 'null');
+  } catch(e) {}
 
   if (!user || user.status !== 'approved') {
-    localStorage.removeItem(KEY);
+    try { localStorage.removeItem(KEY); } catch(e) {}
     location.replace('register.html');
     return;
   }
 
+  // Защита от зависания, если сервер не отвечает
+  let redirected = false;
+  const redirectToLogin = () => {
+    if (redirected) return;
+    redirected = true;
+    try { localStorage.removeItem(KEY); } catch(e) {}
+    location.replace('register.html');
+  };
+
+  const timeoutId = setTimeout(redirectToLogin, 8000);
+
   const cbName = 'cb_auth_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   window[cbName] = (data) => {
+    clearTimeout(timeoutId);
     delete window[cbName];
+    
     if (data && data.valid) {
       document.documentElement.style.display = 'block';
-      initPage(user);
+      setupPage(user);
     } else {
-      localStorage.removeItem(KEY);
-      location.replace('register.html');
+      redirectToLogin();
     }
   };
 
   const s = document.createElement('script');
   s.src = `${WEB_APP_URL}?action=checkSession&userId=${encodeURIComponent(user.id)}&token=${encodeURIComponent(user.token)}&callback=${cbName}`;
-  s.onerror = () => {
-    localStorage.removeItem(KEY);
-    location.replace('register.html');
-  };
+  s.onerror = redirectToLogin;
   document.body.appendChild(s);
 
-  function initPage(user) {
+  function setupPage(user) {
     window.MICH_USER = user;
 
+    // Проверка доступа к тесту
     const testPages = ['test1.html','test2.html','test3.html','service.html','alco1.html','alco2.html','alco3.html','beer1.html','tincture1.html','reg-bar-test.html','reg-urv-test.html','reg-tincture-test.html','final-attestation.html'];
     
-    // Защита прямых ссылок на тесты
     if (testPages.includes(page)) {
       const topicId = page.replace('.html', '');
       let hasAccess = false;
-      
       if (!user.access || user.access.all) hasAccess = true;
       else if (user.access[topicId] === true) hasAccess = true;
 
@@ -63,8 +71,8 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      // Автозаполнение ФИО
+    // Навешиваем UI (плавашку, автозаполнение, скрытие карточек)
+    const initUI = () => {
       const nameInput = document.getElementById('userName');
       if (nameInput) {
         nameInput.value = user.name;
@@ -75,21 +83,22 @@
         if (hint) hint.textContent = `Вы вошли как ${user.name} · ${user.bar || ''}`;
       }
 
-      // Плавашка
-      const badge = document.createElement('div');
-      badge.style.cssText = 'position:fixed;top:12px;right:12px;background:#fff;padding:8px 14px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.12);font-size:13px;z-index:9999;display:flex;gap:10px;align-items:center;font-family:-apple-system,Segoe UI,Roboto,sans-serif';
-      badge.innerHTML = `
-        <span>👤 <b>${user.name.split(' ')[0]}</b></span>
-        <button id="mich-logout" style="padding:5px 10px;background:#f0f2f5;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Выйти</button>
-      `;
-      document.body.appendChild(badge);
-      document.getElementById('mich-logout').onclick = () => {
-        if (!confirm('Выйти из аккаунта?')) return;
-        localStorage.removeItem(KEY);
-        location.href = 'register.html';
-      };
+      if (!document.getElementById('mich-logout-badge')) {
+        const badge = document.createElement('div');
+        badge.id = 'mich-logout-badge';
+        badge.style.cssText = 'position:fixed;top:12px;right:12px;background:#fff;padding:8px 14px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.12);font-size:13px;z-index:9999;display:flex;gap:10px;align-items:center;font-family:-apple-system,Segoe UI,Roboto,sans-serif';
+        badge.innerHTML = `
+          <span>👤 <b>${user.name.split(' ')[0]}</b></span>
+          <button id="mich-logout" style="padding:5px 10px;background:#f0f2f5;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Выйти</button>
+        `;
+        document.body.appendChild(badge);
+        document.getElementById('mich-logout').onclick = () => {
+          if (!confirm('Выйти из аккаунта?')) return;
+          localStorage.removeItem(KEY);
+          location.href = 'register.html';
+        };
+      }
 
-      // Скрытие карточек (и тестов, и лекций)
       if (page === 'index.html' || page === '') {
         const allCards = document.querySelectorAll('a.card');
         allCards.forEach(card => {
@@ -119,6 +128,12 @@
           }
         });
       }
-    });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initUI);
+    } else {
+      initUI();
+    }
   }
 })();
