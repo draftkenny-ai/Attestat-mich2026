@@ -432,7 +432,7 @@ function editUserName(userId, currentName) {
 }
 
 /* ============================================================
-   МАТРИЦА ДОСТУПОВ (Обновленная)
+   МАТРИЦА ДОСТУПОВ (Лекции, Тесты, Итоговая)
    ============================================================ */
 const TOPICS_LECTURES = [
   { id: 'lec_service', name: 'Сервис' }, 
@@ -454,14 +454,14 @@ const TOPICS_TESTS = [
   { id: 'alco2', name: 'Алко 2 (Вкус)' }, 
   { id: 'alco3', name: 'Алко 3 (Гостю)' },
   { id: 'beer1', name: 'Пиво' }, 
-  { id: 'tincture1', name: 'Настойки' }
+  { id: 'tincture1', name: 'Настойки' },
+  { id: 'reg-bar-test', name: 'Рег. Бар' },
+  { id: 'reg-urv-test', name: 'Рег. УРВ' },
+  { id: 'reg-tincture-test', name: 'Рег. Настойки' }
 ];
 
-const TOPICS_REGS = [
-  { id: 'reg-bar-test', name: 'Бар' },
-  { id: 'reg-urv-test', name: 'УРВ' },
-  { id: 'reg-tincture-test', name: 'Настойки' },
-  { id: 'final-attestation', name: '🎓 Итоговая' }
+const TOPICS_FINAL = [
+  { id: 'final-attestation', name: 'Итоговая' }
 ];
 
 let accessUsers = [];
@@ -479,7 +479,6 @@ function loadAccesses() {
 }
 
 function renderAccessTable() {
-  // Стили для шапки
   const thStyle = "font-size: 11px; font-weight: 700; padding: 8px 4px; text-align: center; border-right: 1px solid rgba(255,255,255,0.2); vertical-align: bottom;";
   const tdStyle = "padding: 4px 2px; text-align: center; border-right: 1px solid #eee; width: 30px;";
   
@@ -488,11 +487,10 @@ function renderAccessTable() {
     <th rowspan="2" style="position:sticky; left:80px; background:#4a90d9; z-index:2; min-width:160px; padding: 8px; text-align: left;">ФИО</th>
     <th colspan="${TOPICS_LECTURES.length}" style="text-align:center; background:#357abd; border-left:2px solid #fff; padding: 8px;">📖 Лекции</th>
     <th colspan="${TOPICS_TESTS.length}" style="text-align:center; background:#2c5f8d; border-left:2px solid #fff; padding: 8px;">📝 Тесты</th>
-    <th colspan="${TOPICS_REGS.length}" style="text-align:center; background:#1e466b; border-left:2px solid #fff; padding: 8px;">📋 Регламенты</th>
+    <th colspan="${TOPICS_FINAL.length}" style="text-align:center; background:#c0392b; border-left:2px solid #fff; padding: 8px;">🎓 Аттестация</th>
     <th rowspan="2" style="background:#28a745; text-align:center; min-width:50px; padding: 8px;">Сохр.</th>
   </tr><tr>`;
 
-  // Рендер заголовков колонок (с переносом слов)
   const renderTh = (topic, color) => `
     <th style="background:${color}; ${thStyle}" title="${topic.name}">
       <div style="word-wrap: break-word; max-width: 45px; margin: 0 auto; line-height: 1.2;">${topic.name}</div>
@@ -500,7 +498,8 @@ function renderAccessTable() {
 
   TOPICS_LECTURES.forEach(t => headHtml += renderTh(t, '#4a90d9'));
   TOPICS_TESTS.forEach(t => headHtml += renderTh(t, '#4a90d9'));
-  TOPICS_REGS.forEach(t => headHtml += renderTh(t, '#4a90d9'));
+  TOPICS_FINAL.forEach(t => headHtml += renderTh(t, '#c0392b')); // Красный цвет для итоговой
+  
   headHtml += `</tr>`;
   document.getElementById('accessHead').innerHTML = headHtml;
 
@@ -525,7 +524,7 @@ function renderAccessTable() {
 
     TOPICS_LECTURES.forEach(t => bodyHtml += renderTd(t));
     TOPICS_TESTS.forEach(t => bodyHtml += renderTd(t));
-    TOPICS_REGS.forEach(t => bodyHtml += renderTd(t));
+    TOPICS_FINAL.forEach(t => bodyHtml += renderTd(t));
 
     bodyHtml += `<td style="text-align:center; padding: 4px;"><button onclick="saveUserAccess('${u.id}')" style="padding:6px 10px; background:#28a745; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700;">💾</button></td></tr>`;
   });
