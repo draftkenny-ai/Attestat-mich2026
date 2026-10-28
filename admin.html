@@ -63,7 +63,7 @@
 </head>
 <body>
 
-<!-- ЭКРАН ПАРОЛЯ (по умолчанию виден) -->
+<!-- ЭКРАН ПАРОЛЯ -->
 <div id="lockScreen" class="lock-screen">
   <h2>🔐 Панель руководителя</h2>
   <p>Введите пароль руководителя для доступа</p>
@@ -72,20 +72,21 @@
   <div class="lock-error" id="lockError"></div>
 </div>
 
-<!-- ПАНЕЛЬ (скрыта до ввода пароля) -->
+<!-- ПАНЕЛЬ -->
 <div id="panel" class="container" style="display:none">
   <h1>Панель руководителя</h1>
   <div class="sub">Школа Барменов МиЧ · Gask Bro Group</div>
 
   <div class="tabs">
     <button class="tab active" onclick="showTab('results', this)">📊 Результаты</button>
-    <button class="tab" onclick="showTab('settings', this)">⏱ Настройки таймера</button>
-   <button class="tab" onclick="showTab('access', this)">🔐 Доступы</button>
+    <button class="tab" onclick="showTab('settings', this)">⏱ Настройки</button>
+    <button class="tab" onclick="showTab('users', this)">👥 Пользователи</button>
+    <button class="tab" onclick="showTab('access', this)">🔐 Доступы</button>
   </div>
 
+  <!-- ВКЛАДКА: РЕЗУЛЬТАТЫ -->
   <div id="tab-results" class="panel active">
     <div class="stats" id="stats"></div>
-
     <div class="filters">
       <label>Тест:</label>
       <select id="filterTest" onchange="renderTable()">
@@ -102,6 +103,7 @@
         <option value="Тест · Регламент работы в баре">Регламент работы в баре</option>
         <option value="Тест · Учёт рабочего времени (УРВ)">Учёт рабочего времени</option>
         <option value="Тест · Маркировка и хранение настоек">Маркировка настоек</option>
+        <option value="Итоговая аттестация">Итоговая аттестация</option>
       </select>
       <label>Оценка:</label>
       <select id="filterGrade" onchange="renderTable()">
@@ -115,12 +117,9 @@
       <input type="text" id="filterName" placeholder="Иванов..." oninput="renderTable()">
       <button onclick="loadResults()">🔄 Обновить</button>
     </div>
-
     <table>
       <thead>
-        <tr>
-          <th>Дата</th><th>ФИО</th><th>Тест</th><th>Баллы</th><th>%</th><th>Оценка</th>
-        </tr>
+        <tr><th>Дата</th><th>ФИО</th><th>Тест</th><th>Баллы</th><th>%</th><th>Оценка</th></tr>
       </thead>
       <tbody id="resultsBody">
         <tr><td colspan="6" class="empty">Загрузка...</td></tr>
@@ -128,6 +127,7 @@
     </table>
   </div>
 
+  <!-- ВКЛАДКА: НАСТРОЙКИ -->
   <div id="tab-settings" class="panel">
     <div class="settings-card">
       <h3>⏱ Время на прохождение тестов</h3>
@@ -135,6 +135,56 @@
       <div id="settingsList"></div>
     </div>
   </div>
+
+  <!-- ВКЛАДКА: ПОЛЬЗОВАТЕЛИ -->
+  <div id="tab-users" class="panel">
+    <div class="filters">
+      <label>Статус:</label>
+      <select id="filterUserStatus" onchange="renderUsersTable()">
+        <option value="">Все</option>
+        <option value="pending">На модерации</option>
+        <option value="approved">Одобрены</option>
+        <option value="blocked">Заблокированы</option>
+      </select>
+      <label>Бар:</label>
+      <select id="filterUserBar" onchange="renderUsersTable()">
+        <option value="">Все</option>
+        <option>МиЧ Пятницкая</option>
+        <option>МиЧ Маросейка</option>
+        <option>МиЧ Новослободская</option>
+        <option>МиЧ Белорусская</option>
+        <option>МиЧ Покровка</option>
+        <option>МиЧ КМ</option>
+        <option>МиЧ Лубянка</option>
+      </select>
+      <label>Поиск:</label>
+      <input type="text" id="filterUserName" placeholder="ФИО или телефон…" oninput="renderUsersTable()">
+      <button onclick="loadUsers()">🔄 Обновить</button>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Бар</th><th>ФИО</th><th>Дата рожд.</th><th>Телефон</th><th>Telegram</th><th>Статус</th><th>Регистрация</th><th>Действия</th></tr>
+      </thead>
+      <tbody id="usersBody">
+        <tr><td colspan="8" class="empty">Загрузка…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ВКЛАДКА: ДОСТУПЫ -->
+  <div id="tab-access" class="panel">
+    <div class="filters" style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="font-size: 14px; color: #666;">Отметьте галочками темы, к которым у сотрудника есть доступ.</div>
+      <button onclick="loadAccesses()">🔄 Обновить</button>
+    </div>
+    <div style="overflow-x: auto; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08);">
+      <table id="accessTable" style="white-space: nowrap; min-width: 100%; border-collapse: collapse;">
+        <thead id="accessHead"></thead>
+        <tbody id="accessBody"></tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <div class="toast" id="toast"></div>
@@ -144,7 +194,7 @@ const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZ
 let allResults = [];
 let currentPwd = '';
 
-// Если пароль уже введён в этой сессии — открываем панель сразу
+// Если пароль уже введён — открываем панель сразу
 if (sessionStorage.getItem('mich_mgr_auth')) {
   currentPwd = sessionStorage.getItem('mich_mgr_auth');
   showPanel();
@@ -156,7 +206,6 @@ function unlock() {
   err.textContent = '';
   if (!pwd) { err.textContent = 'Введите пароль'; return; }
 
-  // Проверяем пароль через Apps Script
   jsonp(WEB_APP_URL + '?action=checkPassword&type=manager&pwd=' + encodeURIComponent(pwd), (data) => {
     if (data && data.valid) {
       currentPwd = pwd;
@@ -181,8 +230,13 @@ function showTab(name, btn) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'users') loadUsers();
+  if (name === 'access') loadAccesses();
 }
 
+/* ============================================================
+   РЕЗУЛЬТАТЫ И НАСТРОЙКИ
+   ============================================================ */
 function loadResults() {
   document.getElementById('resultsBody').innerHTML = '<tr><td colspan="6" class="empty">Загрузка...</td></tr>';
   jsonp(WEB_APP_URL + '?action=getResults&pwd=' + encodeURIComponent(currentPwd), (data) => {
@@ -236,7 +290,6 @@ function loadSettings() {
   list.innerHTML = 'Загрузка...';
   jsonp(WEB_APP_URL + '?action=getSettings', (data) => {
     if (!data || !data.settings) { list.innerHTML = 'Ошибка загрузки'; return; }
-    
     const names = {
       'test1.html': { name: 'Тест №1 · Бармен — Метод и посуда', time: 20 },
       'test2.html': { name: 'Тест №2 · Бармен — Ингредиенты', time: 20 },
@@ -249,9 +302,9 @@ function loadSettings() {
       'tincture1.html': { name: 'Тест · Настойки', time: 10 },
       'reg-bar-test.html': { name: 'Тест · Регламент работы в баре', time: 10 },
       'reg-urv-test.html': { name: 'Тест · Учёт рабочего времени', time: 10 },
-      'reg-tincture-test.html': { name: 'Тест · Маркировка настоек', time: 10 }
+      'reg-tincture-test.html': { name: 'Тест · Маркировка настоек', time: 10 },
+      'final-attestation.html': { name: '🎓 Итоговая аттестация', time: 90 }
     };
-    
     let html = '';
     Object.keys(names).forEach(key => {
       const min = data.settings[key] || names[key].time;
@@ -276,6 +329,194 @@ function saveSetting(test) {
   });
 }
 
+/* ============================================================
+   ПОЛЬЗОВАТЕЛИ
+   ============================================================ */
+let allUsers = [];
+
+function loadUsers() {
+  document.getElementById('usersBody').innerHTML = '<tr><td colspan="8" class="empty">Загрузка…</td></tr>';
+  jsonp(WEB_APP_URL + '?action=getUsers&pwd=' + encodeURIComponent(currentPwd), (data) => {
+    if (!data || data.error) {
+      document.getElementById('usersBody').innerHTML = '<tr><td colspan="8" class="empty">Ошибка загрузки</td></tr>';
+      return;
+    }
+    allUsers = data.users || [];
+    renderUsersTable();
+  });
+}
+
+function renderUsersTable() {
+  const fStatus = document.getElementById('filterUserStatus').value;
+  const fBar    = document.getElementById('filterUserBar').value;
+  const fName   = document.getElementById('filterUserName').value.toLowerCase();
+
+  const rows = allUsers.filter(u => {
+    if (fStatus && u.status !== fStatus) return false;
+    if (fBar && u.bar !== fBar) return false;
+    if (fName) {
+      const hay = (u.name + ' ' + u.phone).toLowerCase();
+      if (!hay.includes(fName)) return false;
+    }
+    return true;
+  });
+
+  if (!rows.length) {
+    document.getElementById('usersBody').innerHTML = '<tr><td colspan="8" class="empty">Нет пользователей</td></tr>';
+    return;
+  }
+
+  const statusLabel = {
+    pending:  '<span style="color:#d98428;font-weight:700">⏳ На модерации</span>',
+    approved: '<span style="color:#1e7e34;font-weight:700">✅ Одобрен</span>',
+    blocked:  '<span style="color:#c0392b;font-weight:700">🚫 Заблокирован</span>'
+  };
+
+  document.getElementById('usersBody').innerHTML = rows.map(u => {
+    const date = u.registered ? new Date(u.registered).toLocaleDateString('ru-RU') : '—';
+    let actions = '';
+    if (u.status === 'pending') {
+      actions = `
+        <button onclick="setUserStatus('${u.id}','approved')" style="padding:6px 10px;background:#28a745;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">✅ Одобрить</button>
+        <button onclick="setUserStatus('${u.id}','deleted')" style="padding:6px 10px;background:#d9534f;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🗑 Удалить</button>
+      `;
+    } else if (u.status === 'approved') {
+      actions = `
+        <button onclick="editUserName('${u.id}','${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#f0ad4e;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">✏️ Изменить ФИО</button>
+        <button onclick="setUserStatus('${u.id}','blocked')" style="padding:6px 10px;background:#6c757d;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🚫 Блок</button>
+      `;
+    } else if (u.status === 'blocked') {
+      actions = `
+        <button onclick="setUserStatus('${u.id}','approved')" style="padding:6px 10px;background:#28a745;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">✅ Разблокировать</button>
+        <button onclick="setUserStatus('${u.id}','deleted')" style="padding:6px 10px;background:#d9534f;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🗑 Удалить</button>
+      `;
+    }
+    return `
+      <tr>
+        <td>${u.bar || '—'}</td>
+        <td><b>${u.name}</b></td>
+        <td>${u.birthdate || '—'}</td>
+        <td>${u.phone || '—'}</td>
+        <td>${u.telegram || '—'}</td>
+        <td>${statusLabel[u.status] || u.status}</td>
+        <td>${date}</td>
+        <td>${actions}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function setUserStatus(userId, status) {
+  const texts = { approved: 'Одобрить пользователя?', blocked: 'Заблокировать пользователя?', deleted: 'Удалить пользователя безвозвратно?' };
+  if (!confirm(texts[status] || 'Изменить статус?')) return;
+  const url = WEB_APP_URL + '?action=setUserStatus&pwd=' + encodeURIComponent(currentPwd) + '&userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(status);
+  jsonp(url, (data) => {
+    if (data && data.success) {
+      showToast(status === 'deleted' ? '🗑 Удалён' : status === 'approved' ? '✅ Доступ открыт' : '🚫 Заблокирован');
+      loadUsers();
+    } else {
+      showToast('❌ Ошибка');
+    }
+  });
+}
+
+function editUserName(userId, currentName) {
+  const newName = prompt('Новое ФИО:', currentName);
+  if (!newName || newName.trim() === currentName.trim() || newName.trim().length < 3) return;
+  const url = WEB_APP_URL + '?action=editUserName&pwd=' + encodeURIComponent(currentPwd) + '&userId=' + encodeURIComponent(userId) + '&name=' + encodeURIComponent(newName.trim());
+  jsonp(url, (data) => {
+    if (data && data.success) { showToast('✅ ФИО обновлено'); loadUsers(); }
+    else showToast('❌ Ошибка');
+  });
+}
+
+/* ============================================================
+   МАТРИЦА ДОСТУПОВ
+   ============================================================ */
+const TOPICS_LECTURES = [
+  { id: 'lec_service', name: 'Сервис' }, { id: 'lec_beer', name: 'Пиво' }, { id: 'lec_tincture', name: 'Настойки' },
+  { id: 'lec_alco_hist', name: 'Алкоголь (Ист)' }, { id: 'lec_alco_ref', name: 'Алкоголь (Спр)' },
+  { id: 'lec_reg_bar', name: 'Рег (Бар)' }, { id: 'lec_reg_urv', name: 'Рег (УРВ)' }, { id: 'lec_reg_tincture', name: 'Рег (Наст)' }
+];
+const TOPICS_TESTS = [
+  { id: 'test1', name: 'Тест 1' }, { id: 'test2', name: 'Тест 2' }, { id: 'test3', name: 'Тест 3' }, { id: 'service', name: 'Сервис' },
+  { id: 'alco1', name: 'Алко 1' }, { id: 'alco2', name: 'Алко 2' }, { id: 'alco3', name: 'Алко 3' },
+  { id: 'beer1', name: 'Пиво' }, { id: 'tincture1', name: 'Настойки' },
+  { id: 'reg-bar-test', name: 'Рег (Бар)' }, { id: 'reg-urv-test', name: 'Рег (УРВ)' }, { id: 'reg-tincture-test', name: 'Рег (Наст)' },
+  { id: 'final-attestation', name: 'Итоговая' }
+];
+let accessUsers = [];
+
+function loadAccesses() {
+  document.getElementById('accessBody').innerHTML = '<tr><td colspan="20" class="empty">Загрузка...</td></tr>';
+  jsonp(WEB_APP_URL + '?action=getUsers&pwd=' + encodeURIComponent(currentPwd), (data) => {
+    if (!data || data.error) {
+      document.getElementById('accessBody').innerHTML = '<tr><td colspan="20" class="empty">Ошибка загрузки</td></tr>';
+      return;
+    }
+    accessUsers = data.users.filter(u => u.status === 'approved');
+    renderAccessTable();
+  });
+}
+
+function renderAccessTable() {
+  let headHtml = `<tr>
+    <th style="position:sticky; left:0; background:#4a90d9; z-index:2; min-width:120px;">Бар</th>
+    <th style="position:sticky; left:120px; background:#4a90d9; z-index:2; min-width:180px;">ФИО</th>
+    <th colspan="${TOPICS_LECTURES.length}" style="text-align:center; background:#357abd; border-left:2px solid #fff;">📖 Лекции</th>
+    <th colspan="${TOPICS_TESTS.length}" style="text-align:center; background:#2c5f8d; border-left:2px solid #fff;">📝 Тесты</th>
+    <th style="background:#28a745; text-align:center;">Сохр.</th>
+  </tr><tr>`;
+  TOPICS_LECTURES.forEach(t => headHtml += `<th style="font-size:11px; text-align:center; background:#4a90d9; border-left:1px solid #6ba3e0;" title="${t.name}">${t.name.split(' ')[0]}</th>`);
+  TOPICS_TESTS.forEach(t => headHtml += `<th style="font-size:11px; text-align:center; background:#4a90d9; border-left:1px solid #6ba3e0;" title="${t.name}">${t.name.split(' ')[0]}</th>`);
+  headHtml += `<th></th></tr>`;
+  document.getElementById('accessHead').innerHTML = headHtml;
+
+  if (!accessUsers.length) {
+    document.getElementById('accessBody').innerHTML = '<tr><td colspan="30" class="empty">Нет одобренных пользователей</td></tr>';
+    return;
+  }
+
+  let bodyHtml = '';
+  accessUsers.forEach(u => {
+    let accessObj = {};
+    try { accessObj = u.access ? JSON.parse(u.access) : { all: true }; } catch(e) { accessObj = { all: true }; }
+    bodyHtml += `<tr>
+      <td style="position:sticky; left:0; background:#fff; z-index:1; font-weight:600;">${u.bar}</td>
+      <td style="position:sticky; left:120px; background:#fff; z-index:1; border-right:1px solid #ddd;">${u.name}</td>`;
+    TOPICS_LECTURES.forEach(t => {
+      const checked = accessObj.all || accessObj[t.id] ? 'checked' : '';
+      bodyHtml += `<td style="text-align:center;"><input type="checkbox" class="access-cb" data-user="${u.id}" data-topic="${t.id}" ${checked}></td>`;
+    });
+    TOPICS_TESTS.forEach(t => {
+      const checked = accessObj.all || accessObj[t.id] ? 'checked' : '';
+      bodyHtml += `<td style="text-align:center;"><input type="checkbox" class="access-cb" data-user="${u.id}" data-topic="${t.id}" ${checked}></td>`;
+    });
+    bodyHtml += `<td style="text-align:center;"><button onclick="saveUserAccess('${u.id}')" style="padding:6px 12px; background:#28a745; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700;">💾</button></td></tr>`;
+  });
+  document.getElementById('accessBody').innerHTML = bodyHtml;
+}
+
+function saveUserAccess(userId) {
+  const checkboxes = document.querySelectorAll(`.access-cb[data-user="${userId}"]`);
+  const accessObj = {};
+  checkboxes.forEach(cb => { if (cb.checked) accessObj[cb.dataset.topic] = true; });
+  const jsonStr = JSON.stringify(accessObj);
+  const url = WEB_APP_URL + '?action=saveUserAccess&pwd=' + encodeURIComponent(currentPwd) + '&userId=' + encodeURIComponent(userId) + '&access=' + encodeURIComponent(jsonStr);
+  jsonp(url, (data) => {
+    if (data && data.success) {
+      showToast('✅ Права сохранены');
+      const u = accessUsers.find(x => x.id === userId);
+      if (u) u.access = jsonStr;
+    } else {
+      showToast('❌ Ошибка сохранения');
+    }
+  });
+}
+
+/* ============================================================
+   УТИЛИТЫ
+   ============================================================ */
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
