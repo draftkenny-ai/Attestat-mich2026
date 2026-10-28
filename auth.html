@@ -9,13 +9,10 @@
 
   if (isRegisterPage || isAdminPage) return;
 
-  // 1. СКРЫВАЕМ СТРАНИЦУ
   document.documentElement.style.display = 'none';
 
   let user = null;
-  try {
-    user = JSON.parse(localStorage.getItem(KEY) || 'null');
-  } catch(e) {}
+  try { user = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) {}
 
   if (!user || user.status !== 'approved') {
     try { localStorage.removeItem(KEY); } catch(e) {}
@@ -23,7 +20,6 @@
     return;
   }
 
-  // Защита от зависания, если сервер не отвечает
   let redirected = false;
   const redirectToLogin = () => {
     if (redirected) return;
@@ -40,6 +36,12 @@
     delete window[cbName];
     
     if (data && data.valid) {
+      // ОБНОВЛЯЕМ ПРАВА ИЗ СЕРВЕРА (на случай если админ их поменял)
+      if (data.access) {
+        user.access = data.access;
+        localStorage.setItem(KEY, JSON.stringify(user)); // сохраняем новое
+      }
+      
       document.documentElement.style.display = 'block';
       setupPage(user);
     } else {
@@ -55,14 +57,13 @@
   function setupPage(user) {
     window.MICH_USER = user;
 
-    // Проверка доступа к тесту
     const testPages = ['test1.html','test2.html','test3.html','service.html','alco1.html','alco2.html','alco3.html','beer1.html','tincture1.html','reg-bar-test.html','reg-urv-test.html','reg-tincture-test.html','final-attestation.html'];
     
     if (testPages.includes(page)) {
       const topicId = page.replace('.html', '');
       let hasAccess = false;
-      if (!user.access || user.access.all) hasAccess = true;
-      else if (user.access[topicId] === true) hasAccess = true;
+      // Если прав нет вообще или стоит галочка all
+      if (!user.access || user.access.all || user.access[topicId] === true) hasAccess = true;
 
       if (!hasAccess) {
         alert('⛔ У вас нет доступа к этому тесту. Обратитесь к руководителю.');
@@ -71,7 +72,6 @@
       }
     }
 
-    // Навешиваем UI (плавашку, автозаполнение, скрытие карточек)
     const initUI = () => {
       const nameInput = document.getElementById('userName');
       if (nameInput) {
@@ -111,8 +111,7 @@
 
           if (topicId) {
             let hasAccess = false;
-            if (!user.access || user.access.all) hasAccess = true;
-            else if (user.access[topicId] === true) hasAccess = true;
+            if (!user.access || user.access.all || user.access[topicId] === true) hasAccess = true;
 
             if (!hasAccess) {
               card.style.opacity = '0.5';
