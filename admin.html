@@ -368,6 +368,27 @@ function saveSetting(test) {
    ============================================================ */
 let allUsers = [];
 
+function formatBirthdate(dateStr) {
+  if (!dateStr) return '—';
+  let str = String(dateStr).trim();
+  
+  // Если пришла строка формата ISO (содержит 'T'), отрезаем время
+  if (str.includes('T')) {
+    str = str.split('T')[0];
+  }
+  
+  // Разделяем по дефису (ГГГГ-ММ-ДД)
+  const parts = str.split('-');
+  if (parts.length === 3) {
+    if (parts[0].length === 4) {
+      // Меняем порядок на ДД-ММ-ГГГГ
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+  }
+  
+  return str; // Если формат неизвестен, возвращаем как есть
+}
+
 function loadUsers() {
   document.getElementById('usersBody').innerHTML = '<tr><td colspan="8" class="empty">Загрузка…</td></tr>';
   jsonp(WEB_APP_URL + '?action=getUsers&pwd=' + encodeURIComponent(currentPwd), (data) => {
@@ -429,7 +450,7 @@ function renderUsersTable() {
       <tr>
         <td>${u.bar || '—'}</td>
         <td><b>${u.name}</b></td>
-        <td>${u.birthdate || '—'}</td>
+        <td>${formatBirthdate(u.birthdate)}</td>
         <td>${u.phone || '—'}</td>
         <td>${u.telegram || '—'}</td>
         <td>${statusLabel[u.status] || u.status}</td>
