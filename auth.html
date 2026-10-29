@@ -7,16 +7,28 @@
   const isRegisterPage = page === 'register.html';
   const isAdminPage    = page === 'admin.html';
 
+  // Если мы внутри iframe, не скрываем страницу полностью (иначе будет белый экран)
+  const isIframe = window.top !== window.self;
+
   if (isRegisterPage || isAdminPage) return;
 
-  document.documentElement.style.display = 'none';
+  // Функция для редиректа (с учетом iframe)
+  function goToLogin() {
+    try { localStorage.removeItem(KEY); } catch(e) {}
+    if (isIframe) {
+      window.top.location.href = 'register.html'; // Перекидываем ВСЮ страницу
+    } else {
+      location.replace('register.html');
+    }
+  }
+
+  if (!isIframe) document.documentElement.style.display = 'none';
 
   let user = null;
   try { user = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) {}
 
   if (!user || user.status !== 'approved') {
-    try { localStorage.removeItem(KEY); } catch(e) {}
-    location.replace('register.html');
+    goToLogin();
     return;
   }
 
@@ -24,8 +36,7 @@
   const redirectToLogin = () => {
     if (redirected) return;
     redirected = true;
-    try { localStorage.removeItem(KEY); } catch(e) {}
-    location.replace('register.html');
+    goToLogin();
   };
 
   const timeoutId = setTimeout(redirectToLogin, 8000);
@@ -36,13 +47,12 @@
     delete window[cbName];
     
     if (data && data.valid) {
-      // ОБНОВЛЯЕМ ПРАВА ИЗ СЕРВЕРА (на случай если админ их поменял)
+      if (!isIframe) document.documentElement.style.display = 'block';
+      
       if (data.access) {
         user.access = data.access;
-        localStorage.setItem(KEY, JSON.stringify(user)); // сохраняем новое
+        localStorage.setItem(KEY, JSON.stringify(user));
       }
-      
-      document.documentElement.style.display = 'block';
       setupPage(user);
     } else {
       redirectToLogin();
@@ -62,12 +72,12 @@
     if (testPages.includes(page)) {
       const topicId = page.replace('.html', '');
       let hasAccess = false;
-      // Если прав нет вообще или стоит галочка all
       if (!user.access || user.access.all || user.access[topicId] === true) hasAccess = true;
 
       if (!hasAccess) {
-        alert('⛔ У вас нет доступа к этому тесту. Обратитесь к руководителю.');
-        location.replace('index.html');
+        alert('⛔ У вас нет доступа к этому тесту.');
+        if (isIframe) window.top.location.href = 'index.html';
+        else location.replace('index.html');
         return;
       }
     }
@@ -83,23 +93,8 @@
         if (hint) hint.textContent = `Вы вошли как ${user.name} · ${user.bar || ''}`;
       }
 
-      if (!document.getElementById('mich-logout-badge')) {
-        const badge = document.createElement('div');
-        badge.id = 'mich-logout-badge';
-        badge.style.cssText = 'position:fixed;top:12px;right:12px;background:#fff;padding:8px 14px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.12);font-size:13px;z-index:9999;display:flex;gap:10px;align-items:center;font-family:-apple-system,Segoe UI,Roboto,sans-serif';
-        badge.innerHTML = `
-          <span>👤 <b>${user.name.split(' ')[0]}</b></span>
-          <button id="mich-logout" style="padding:5px 10px;background:#f0f2f5;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Выйти</button>
-        `;
-        document.body.appendChild(badge);
-        document.getElementById('mich-logout').onclick = () => {
-          if (!confirm('Выйти из аккаунта?')) return;
-          localStorage.removeItem(KEY);
-          location.href = 'register.html';
-        };
-      }
-
-      if (page === 'index.html' || page === '') {
+      // Скрываем карточки на главной (только если мы не в iframe)
+      if (!isIframe && (page === 'index.html' || page === '')) {
         const allCards = document.querySelectorAll('a.card');
         allCards.forEach(card => {
           const href = card.getAttribute('href') || '';
