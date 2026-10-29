@@ -9,14 +9,6 @@
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(160deg,#4a90d9 0%,#2c5f8d 60%,#1e466b 100%);min-height:100vh;padding:24px 20px;color:#1a1a1a}
   .container{max-width:1080px;margin:0 auto}
 
-  .lock-screen{background:#fff;padding:40px 32px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.18);max-width:400px;margin:80px auto;text-align:center}
-  .lock-screen h2{font-size:20px;margin-bottom:8px}
-  .lock-screen p{color:#666;font-size:13.5px;margin-bottom:22px}
-  .lock-screen input{width:100%;padding:14px 16px;font-size:16px;border:2px solid #d0d7de;border-radius:10px;outline:none;text-align:center;letter-spacing:2px}
-  .lock-screen input:focus{border-color:#4a90d9}
-  .lock-screen button{width:100%;padding:14px;margin-top:14px;font-size:15px;font-weight:700;background:#4a90d9;color:#fff;border:none;border-radius:10px;cursor:pointer}
-  .lock-error{color:#d9534f;font-size:13px;margin-top:10px;height:16px}
-
   .header{text-align:center;color:#fff;margin-bottom:36px}
   .header h1{font-size:34px;font-weight:800;margin-bottom:10px;letter-spacing:-.5px}
   .header p{font-size:15px;opacity:.92;line-height:1.5;max-width:640px;margin:0 auto}
@@ -40,7 +32,7 @@
   .subsection-head .badge.ready{background:#e6f6eb;color:#1e7e34}
 
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-  .card{background:#f8fafc;border:2px solid #eef2f7;border-radius:14px;padding:20px;text-decoration:none;color:inherit;display:block;transition:transform .15s,border-color .15s,box-shadow .15s;position:relative}
+  .card{background:#f8fafc;border:2px solid #eef2f7;border-radius:14px;padding:20px;text-decoration:none;color:inherit;display:block;transition:transform .15s,border-color .15s,box-shadow .15s;position:relative;cursor:pointer}
   .card:hover{transform:translateY(-3px);border-color:#4a90d9;box-shadow:0 6px 20px rgba(74,144,217,.15)}
   .card-num{display:inline-block;min-width:38px;height:32px;line-height:32px;padding:0 10px;text-align:center;background:#4a90d9;color:#fff;border-radius:9px;font-weight:700;font-size:13px;margin-bottom:12px}
   .card.alco .card-num{background:#d98428}
@@ -65,54 +57,60 @@
   .lectures-placeholder h4{font-size:15px;font-weight:700;color:#5a6b7a;margin-bottom:6px}
   .lectures-placeholder p{font-size:13px;line-height:1.5;max-width:420px;margin:0 auto}
 
-  /* ===== ФУТЕР ===== */
-  .footer {
-    text-align: center;
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 13.5px;
-    margin-top: 40px;
-    padding-bottom: 30px;
-    line-height: 1.8;
-    background: transparent;
-  }
-  .footer a {
-    color: #fff;
-    text-decoration: none;
-    background: rgba(255, 255, 255, 0.15);
-    padding: 8px 18px;
-    border-radius: 8px;
-    display: inline-block;
-    margin-top: 12px;
-    font-weight: 600;
-    font-size: 13px;
-    transition: background 0.2s, transform 0.2s;
-  }
-  .footer a:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: translateY(-2px);
-    text-decoration: none;
-  }
+  .footer {text-align: center;color: rgba(255, 255, 255, 0.85);font-size: 13.5px;margin-top: 40px;padding-bottom: 30px;line-height: 1.8;}
+  .footer a {color: #fff;text-decoration: none;background: rgba(255, 255, 255, 0.15);padding: 8px 18px;border-radius: 8px;display: inline-block;margin-top: 12px;font-weight: 600;font-size: 13px;transition: background 0.2s, transform 0.2s;}
+  .footer a:hover {background: rgba(255, 255, 255, 0.25);transform: translateY(-2px);}
 
-  /* Кнопка выхода */
-  .logout-btn {
+  .logout-btn {position: fixed;top: 15px;right: 15px;z-index: 9999;background: rgba(255,255,255,0.2);color: #fff;border: 1px solid rgba(255,255,255,0.4);padding: 8px 16px;border-radius: 8px;font-weight: 600;cursor: pointer;backdrop-filter: blur(4px);transition: 0.2s;font-family: inherit;font-size: 14px;}
+  .logout-btn:hover {background: rgba(255,255,255,0.3);}
+
+  /* =========================================
+     МОДАЛЬНОЕ ОКНО (IFRAME OVERLAY)
+     ========================================= */
+  #iframe-modal {
+    display: none;
     position: fixed;
-    top: 15px;
-    right: 15px;
-    z-index: 9999;
-    background: rgba(255,255,255,0.2);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.4);
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    backdrop-filter: blur(4px);
-    transition: 0.2s;
-    font-family: inherit;
-    font-size: 14px;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #f0f2f5;
+    z-index: 10000;
+    flex-direction: column;
   }
-  .logout-btn:hover {
-    background: rgba(255,255,255,0.3);
+  #iframe-modal.active {
+    display: flex;
+  }
+  .iframe-header {
+    background: #fff;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+  }
+  .back-btn {
+    background: #eef2f7;
+    border: none;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #333;
+    transition: 0.2s;
+  }
+  .back-btn:hover {
+    background: #d0d7de;
+  }
+  .iframe-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  #iframe-content {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: #f0f2f5;
   }
 
   @media (max-width:600px){
@@ -125,17 +123,27 @@
     .cards{grid-template-columns:1fr}
     .card{padding:16px}
     .logout-btn { top: 10px; right: 10px; padding: 6px 12px; font-size: 12px; }
+    .iframe-header { padding: 10px 12px; }
+    .back-btn { padding: 8px 14px; font-size: 14px; }
   }
 </style>
 </head>
 <body>
- <script src="auth.js?v=4"></script>
+ <script src="auth.js?v=5"></script>
  
- <!-- Кнопка выхода -->
  <button onclick="logoutUser()" class="logout-btn">🚪 Выйти</button>
 
-<div class="container">
+<!-- МОДАЛЬНОЕ ОКНО ДЛЯ ТЕСТОВ И ЛЕКЦИЙ -->
+<div id="iframe-modal">
+  <div class="iframe-header">
+    <button class="back-btn" onclick="closeIframe()">← Назад</button>
+    <div class="iframe-title" id="iframe-title">Загрузка...</div>
+  </div>
+  <!-- Здесь будет открываться тест или лекция -->
+  <iframe id="iframe-content" src="about:blank" allow="autoplay"></iframe>
+</div>
 
+<div class="container">
   <div id="mainContent">
     <div class="header">
       <h1>Школа Барменов "Моряк и Чайка"</h1>
@@ -158,7 +166,7 @@
           <span class="badge ready">Доступно</span>
         </div>
         <div class="cards">
-          <a class="card" data-topic="lec_service" href="https://drive.google.com/file/d/1v30dt9UxlVzJmkgfHu3W0COs0gnwCcPP/preview" target="_blank" rel="noopener">
+          <a class="card" data-topic="lec_service" href="https://drive.google.com/file/d/1v30dt9UxlVzJmkgfHu3W0COs0gnwCcPP/preview">
             <div class="card-num">📄</div>
             <h4>Лекции по сервису</h4>
             <p>Полный учебный материал по сервису.</p>
@@ -217,13 +225,13 @@
           <span class="badge ready">Доступно · 2</span>
         </div>
         <div class="cards">
-          <a class="card beer" data-topic="lec_beer" href="https://drive.google.com/file/d/1CNaD0zd15FRSOFaXk57Gg8ZG7xgj6a3O/preview" target="_blank" rel="noopener">
+          <a class="card beer" data-topic="lec_beer" href="https://drive.google.com/file/d/1CNaD0zd15FRSOFaXk57Gg8ZG7xgj6a3O/preview">
             <div class="card-num">🍺</div>
             <h4>Пиво</h4>
             <p>Классификация, сорта, производство и вкусовые характеристики пива.</p>
             <div class="meta"><span>PDF · Google Drive</span></div>
           </a>
-          <a class="card beer" data-topic="lec_tincture" href="https://drive.google.com/file/d/1J_7BMPBkW4piBLGKuvgnmQs8X7k5XC0J/preview" target="_blank" rel="noopener">
+          <a class="card beer" data-topic="lec_tincture" href="https://drive.google.com/file/d/1J_7BMPBkW4piBLGKuvgnmQs8X7k5XC0J/preview">
             <div class="card-num">🍯</div>
             <h4>Настойки</h4>
             <p>Виды настоек, производство, вкусовые профили и особенности подачи.</p>
@@ -270,13 +278,13 @@
           <span class="badge ready">Доступно · 2</span>
         </div>
         <div class="cards">
-          <a class="card alco" data-topic="lec_alco_hist" href="https://drive.google.com/file/d/1LuuJrtI-nf9xebnhWb__gMlMg9nRHKbP/preview" target="_blank" rel="noopener">
+          <a class="card alco" data-topic="lec_alco_hist" href="https://drive.google.com/file/d/1LuuJrtI-nf9xebnhWb__gMlMg9nRHKbP/preview">
             <div class="card-num">📄</div>
             <h4>Алкоголь и спирты — История, классификация, производство</h4>
             <p>Полный учебный материал по спиртам: виды, технологии, регионы.</p>
             <div class="meta"><span>PDF · Google Drive</span></div>
           </a>
-          <a class="card alco" data-topic="lec_alco_ref" href="https://drive.google.com/file/d/1fm0Tc4mAKlqNowRavGGZUeNMgTgbpquy/preview" target="_blank" rel="noopener">
+          <a class="card alco" data-topic="lec_alco_ref" href="https://drive.google.com/file/d/1fm0Tc4mAKlqNowRavGGZUeNMgTgbpquy/preview">
             <div class="card-num">📄</div>
             <h4>Справочник по ассортименту в баре</h4>
             <p>Полный справочник алкогольной карты бара: бренды, характеристики, рекомендации.</p>
@@ -329,19 +337,19 @@
           <span class="badge ready">Доступно · 3</span>
         </div>
         <div class="cards">
-          <a class="card reg" data-topic="lec_reg_bar" href="https://drive.google.com/file/d/1J6BF-wz3fIuL3aNUcUcORADmZrXg8Gl3/preview" target="_blank" rel="noopener">
+          <a class="card reg" data-topic="lec_reg_bar" href="https://drive.google.com/file/d/1J6BF-wz3fIuL3aNUcUcORADmZrXg8Gl3/preview">
             <div class="card-num">📄</div>
             <h4>Регламент работы в баре</h4>
             <p>Мерная посуда, чеки, быстрый и долгий чек, запреты и штрафы.</p>
             <div class="meta"><span>PDF · Google Drive</span></div>
           </a>
-          <a class="card reg" data-topic="lec_reg_urv" href="https://drive.google.com/file/d/1JDQ9DuXLjlZn7FiotyNH6a6dd2C6SsAP/preview" target="_blank" rel="noopener">
+          <a class="card reg" data-topic="lec_reg_urv" href="https://drive.google.com/file/d/1JDQ9DuXLjlZn7FiotyNH6a6dd2C6SsAP/preview">
             <div class="card-num">📄</div>
             <h4>Учёт рабочего времени (УРВ)</h4>
             <p>Вход и выход, Авангард, чат АУДИТ, что делать при пропуске отметки.</p>
             <div class="meta"><span>PDF · Google Drive</span></div>
           </a>
-          <a class="card reg" data-topic="lec_reg_tincture" href="https://drive.google.com/file/d/12_zwWPxKQeXs8RJsKY6eMSjc1hARZ9k0/preview" target="_blank" rel="noopener">
+          <a class="card reg" data-topic="lec_reg_tincture" href="https://drive.google.com/file/d/12_zwWPxKQeXs8RJsKY6eMSjc1hARZ9k0/preview">
             <div class="card-num">📄</div>
             <h4>Маркировка и хранение настоек</h4>
             <p>Тара по ГОСТ, 9 пунктов этикетки, условия хранения, пустые бутылки.</p>
@@ -376,7 +384,7 @@
           </a>
         </div>
       </div>
-    </div> <!-- ЗАКРЫТИЕ РАЗДЕЛА РЕГЛАМЕНТЫ -->
+    </div>
 
     <!-- ========== РАЗДЕЛ: ИТОГОВАЯ АТТЕСТАЦИЯ ========== -->
     <div class="section">
@@ -399,16 +407,15 @@
           <p>Здесь появится финальный тест по всем пройденным темам. Раздел будет заполнен позже.</p>
         </div>
       </div>
-    </div> <!-- ЗАКРЫТИЕ РАЗДЕЛА ИТОГОВАЯ АТТЕСТАЦИЯ -->
+    </div>
 
     <!-- ФУТЕР -->
     <div class="footer">
       Gask Bro Group · Хорошие люди, после смерти, попадают в бар!<br>
       <a href="admin.html">🔐 Панель руководителя</a>
     </div>
-
-  </div> <!-- Закрывается div id="mainContent" -->
-</div> <!-- Закрывается div class="container" -->
+  </div>
+</div>
 
 <script>
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZTqxuRO5vVcZs5Q9MlPbtPK9gEnMlEWFpJpq3FtQsdi_cPR4y/exec';
@@ -416,7 +423,64 @@ const STORAGE_KEY = 'mich_auth';
 
 document.addEventListener('DOMContentLoaded', () => {
   loadTimers();
+  setupIframeLinks(); // Подключаем перехват кликов
 });
+
+// ФУНКЦИЯ ВЫХОДА
+function logoutUser() {
+  if (confirm('Вы уверены, что хотите выйти?')) {
+    localStorage.removeItem('mich_user');
+    window.location.href = 'register.html';
+  }
+}
+
+// ПЕРЕХВАТ КЛИКОВ ПО КАРТОЧКАМ
+function setupIframeLinks() {
+  const modal = document.getElementById('iframe-modal');
+  const iframe = document.getElementById('iframe-content');
+  const titleEl = document.getElementById('iframe-title');
+
+  document.querySelectorAll('a.card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      // Если у карточки есть атрибут data-topic или это ссылка на файл
+      const href = card.getAttribute('href');
+      if (!href || href.startsWith('#')) return;
+      
+      // Блокируем стандартный переход по ссылке
+      e.preventDefault();
+      
+      // Получаем название лекции/теста
+      const title = card.querySelector('h4').innerText;
+      titleEl.innerText = title;
+      
+      // Загружаем контент в iframe
+      iframe.src = href;
+      
+      // Показываем модальное окно
+      modal.classList.add('active');
+      
+      // Меняем URL в браузере (чтобы кнопка "Назад" в браузере тоже работала)
+      history.pushState({ modal: true }, '', '#open');
+    });
+  });
+
+  // Функция закрытия модального окна
+  window.closeIframe = function() {
+    modal.classList.remove('active');
+    iframe.src = 'about:blank'; // Останавливаем видео/тесты
+    if (history.state && history.state.modal) {
+      history.back(); // Убираем #open из URL
+    }
+  };
+
+  // Обработка кнопки "Назад" в браузере
+  window.addEventListener('popstate', (e) => {
+    if (modal.classList.contains('active')) {
+      modal.classList.remove('active');
+      iframe.src = 'about:blank';
+    }
+  });
+}
 
 function loadTimers() {
   jsonp(WEB_APP_URL + '?action=getSettings', (data) => {
@@ -428,14 +492,6 @@ function loadTimers() {
       });
     }
   });
-}
-
-// ФУНКЦИЯ ВЫХОДА
-function logoutUser() {
-  if (confirm('Вы уверены, что хотите выйти?')) {
-    localStorage.removeItem('mich_user');
-    window.location.href = 'register.html';
-  }
 }
 
 function jsonp(url, callback) {
