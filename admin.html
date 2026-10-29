@@ -271,6 +271,16 @@ function showTab(name, btn) {
 /* ============================================================
    РЕЗУЛЬТАТЫ И НАСТРОЙКИ
    ============================================================ */
+
+// Хелпер для правильного парсинга процентов (превращает 0.78 в 78)
+function parsePercent(val) {
+  if (val === undefined || val === null || val === '') return 0;
+  let num = parseFloat(String(val).replace('%', '').replace(',', '.'));
+  if (isNaN(num)) return 0;
+  if (num <= 1 && num > 0) num = num * 100; 
+  return Math.round(num);
+}
+
 function loadResults() {
   document.getElementById('resultsBody').innerHTML = '<tr><td colspan="6" class="empty">Загрузка...</td></tr>';
   jsonp(WEB_APP_URL + '?action=getResults&pwd=' + encodeURIComponent(currentPwd), (data) => {
@@ -286,9 +296,15 @@ function loadResults() {
 
 function renderStats() {
   const total = allResults.length;
-  const avg = total ? (allResults.reduce((s, r) => s + (parseInt(r.pct) || 0), 0) / total).toFixed(1) : '—';
+  
+  // Считаем средний результат правильно
+  let totalPct = 0;
+  allResults.forEach(r => { totalPct += parsePercent(r.pct); });
+  const avg = total ? Math.round(totalPct / total) : '—';
+  
   const grade5 = allResults.filter(r => String(r.grade) === '5').length;
   const grade2 = allResults.filter(r => String(r.grade) === '2').length;
+  
   document.getElementById('stats').innerHTML = `
     <div class="stat"><div class="stat-label">Всего прохождений</div><div class="stat-value">${total}</div></div>
     <div class="stat"><div class="stat-label">Средний результат</div><div class="stat-value">${avg}%</div></div>
@@ -314,7 +330,7 @@ function renderTable() {
   document.getElementById('resultsBody').innerHTML = rows.map(r => `
     <tr>
       <td>${r.date}</td><td>${r.name}</td><td>${r.test}</td>
-      <td>${r.score}</td><td>${r.pct}</td>
+      <td>${r.score}</td><td>${parsePercent(r.pct)}%</td>
       <td><span class="grade grade-${r.grade}">${r.grade}</span></td>
     </tr>`).join('');
 }
