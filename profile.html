@@ -97,6 +97,15 @@ const checkUserInterval = setInterval(() => {
   }
 }, 100);
 
+// Хелпер для парсинга процентов
+function parsePercent(val) {
+  if (val === undefined || val === null || val === '') return 0;
+  let num = parseFloat(String(val).replace('%', '').replace(',', '.'));
+  if (isNaN(num)) return 0;
+  if (num <= 1 && num > 0) num = num * 100;
+  return Math.round(num);
+}
+
 function initProfile(user) {
   // Заполняем шапку профиля
   document.getElementById('user-name').textContent = user.name;
@@ -119,9 +128,9 @@ function initProfile(user) {
       return;
     }
 
-    // Считаем статистику
+    // Считаем статистику (средний балл считается корректно даже для 1 теста)
     let totalPct = 0;
-    data.results.forEach(r => { totalPct += parseInt(r.pct) || 0; });
+    data.results.forEach(r => { totalPct += parsePercent(r.pct); });
     const avg = Math.round(totalPct / data.results.length);
 
     document.getElementById('stat-total').textContent = data.results.length;
@@ -153,7 +162,7 @@ function initProfile(user) {
         <tr>
           <td style="color:#888;font-size:13px">${dateStr}</td>
           <td style="font-weight:600">${r.test}</td>
-          <td style="font-weight:700;color:#4a90d9">${r.pct}</td>
+          <td style="font-weight:700;color:#4a90d9">${parsePercent(r.pct)}%</td>
           <td><span class="grade grade-${r.grade}">${r.grade}</span></td>
         </tr>
       `;
