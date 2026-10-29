@@ -21,6 +21,7 @@
   .section-icon.beer{background:#fdf3e3;color:#c17d1a}
   .section-icon.reg{background:#e6f2f0;color:#2c7a6b}
   .section-icon.final{background:#fdeaea;color:#c0392b}
+  .section-icon.ttk{background:#f3e8ff;color:#9333ea}
   .section-head h2{font-size:22px;font-weight:800;color:#1a1a1a}
   .section-head .section-sub{font-size:13px;color:#777;margin-top:2px}
 
@@ -45,6 +46,8 @@
   .card.final .card-num{background:#c0392b}
   .card.final .meta{color:#c0392b}
   .card.final .timer-badge{background:#fdeaea;color:#c0392b}
+  .card.ttk-card-btn .card-num{background:#9333ea}
+  .card.ttk-card-btn .meta{color:#9333ea}
   .card h4{font-size:15.5px;font-weight:700;margin-bottom:6px;color:#1a1a1a;line-height:1.35}
   .card p{font-size:12.5px;color:#666;line-height:1.5;margin-bottom:12px}
   .card .meta{font-size:12px;color:#4a90d9;font-weight:600;display:flex;justify-content:space-between;align-items:center}
@@ -61,84 +64,37 @@
   .footer a {color: #fff;text-decoration: none;background: rgba(255, 255, 255, 0.15);padding: 8px 18px;border-radius: 8px;display: inline-block;margin-top: 12px;font-weight: 600;font-size: 13px;transition: background 0.2s, transform 0.2s;}
   .footer a:hover {background: rgba(255, 255, 255, 0.25);transform: translateY(-2px);}
 
-  /* =========================================
-     ВЕРХНЕЕ МЕНЮ (Кнопки профиля и выхода)
-     ========================================= */
-  .top-nav {
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    z-index: 9999;
-    display: flex;
-    gap: 10px;
-  }
-  .logout-btn {
-    background: rgba(255,255,255,0.2);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.4);
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    backdrop-filter: blur(4px);
-    transition: 0.2s;
-    font-family: inherit;
-    font-size: 14px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
+  .top-nav {position: fixed;top: 15px;right: 15px;z-index: 9999;display: flex;gap: 10px;}
+  .logout-btn {background: rgba(255,255,255,0.2);color: #fff;border: 1px solid rgba(255,255,255,0.4);padding: 8px 16px;border-radius: 8px;font-weight: 600;cursor: pointer;backdrop-filter: blur(4px);transition: 0.2s;font-family: inherit;font-size: 14px;text-decoration: none;display: inline-flex;align-items: center;justify-content: center;}
   .logout-btn:hover {background: rgba(255,255,255,0.3);}
 
-  /* =========================================
-     МОДАЛЬНОЕ ОКНО (IFRAME OVERLAY)
-     ========================================= */
-  #iframe-modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: #f0f2f5;
-    z-index: 10000;
-    flex-direction: column;
-  }
-  #iframe-modal.active {
-    display: flex;
-  }
-  .iframe-header {
-    background: #fff;
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    flex-shrink: 0;
-  }
-  .back-btn {
-    background: #eef2f7;
-    border: none;
-    padding: 10px 20px;
-    font-size: 15px;
-    font-weight: 700;
-    border-radius: 8px;
-    cursor: pointer;
-    color: #333;
-    transition: 0.2s;
-  }
-  .back-btn:hover {
-    background: #d0d7de;
-  }
-  .iframe-title {
-    font-size: 16px;
-    font-weight: 700;
-    color: #1a1a1a;
-  }
-  #iframe-content {
-    flex: 1;
-    width: 100%;
-    border: none;
-    background: #f0f2f5;
-  }
+  #iframe-modal, #ttk-page {display: none;position: fixed;top: 0; left: 0; right: 0; bottom: 0;background: #f0f2f5;z-index: 10000;flex-direction: column;}
+  #iframe-modal.active, #ttk-page.active {display: flex;}
+  .iframe-header {background: #fff;padding: 12px 20px;display: flex;align-items: center;gap: 16px;box-shadow: 0 2px 8px rgba(0,0,0,0.1);flex-shrink: 0;}
+  .back-btn {background: #eef2f7;border: none;padding: 10px 20px;font-size: 15px;font-weight: 700;border-radius: 8px;cursor: pointer;color: #333;transition: 0.2s;}
+  .back-btn:hover {background: #d0d7de;}
+  .iframe-title {font-size: 16px;font-weight: 700;color: #1a1a1a;}
+  #iframe-content {flex: 1;width: 100%;border: none;background: #f0f2f5;}
+
+  /* ===== ТТК СТИЛИ ===== */
+  .ttk-content-wrapper {padding: 24px 20px; max-width: 1080px; margin: 0 auto; width: 100%; overflow-y: auto;}
+  .ttk-tabs {display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; background: #f8fafc; padding: 6px; border-radius: 12px;}
+  .ttk-tab {padding: 8px 16px; background: transparent; border: none; font-size: 13px; font-weight: 700; color: #666; border-radius: 8px; cursor: pointer; transition: 0.2s;}
+  .ttk-tab:hover {background: #eef2f7;}
+  .ttk-tab.active {background: #9333ea; color: #fff; box-shadow: 0 2px 8px rgba(147,51,234,0.3);}
+  
+  .ttk-grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px;}
+  .ttk-card {background: #fff; border: 1px solid #eef2f7; border-radius: 12px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; flex-direction: column;}
+  .ttk-card h4 {font-size: 16px; font-weight: 800; color: #1a1a1a; margin-bottom: 8px;}
+  .ttk-meta {display: flex; gap: 8px; margin-bottom: 12px;}
+  .ttk-badge {font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: #f3e8ff; color: #9333ea;}
+  .ttk-badge.glass {background: #e0f2fe; color: #0284c7;}
+  .ttk-desc {font-size: 12.5px; color: #555; line-height: 1.5; margin-bottom: 12px; font-style: italic; flex-grow: 1;}
+  .ttk-ingredients {border-top: 1px dashed #eef2f7; padding-top: 10px;}
+  .ttk-ing-row {display: flex; justify-content: space-between; font-size: 12.5px; padding: 4px 0; border-bottom: 1px solid #f8fafc;}
+  .ttk-ing-row:last-child {border-bottom: none;}
+  .ttk-ing-name {color: #333; font-weight: 500;}
+  .ttk-ing-weight {color: #9333ea; font-weight: 700; white-space: nowrap; margin-left: 10px;}
 
   @media (max-width:600px){
     body{padding:16px 12px}
@@ -149,25 +105,19 @@
     .section-icon{width:40px;height:40px;font-size:20px}
     .cards{grid-template-columns:1fr}
     .card{padding:16px}
-    
-    .top-nav { 
-      top: 10px; 
-      right: 10px; 
-      flex-direction: column; /* На телефоне кнопки встанут друг под другом */
-    }
-    .logout-btn { 
-      padding: 8px 12px; 
-      font-size: 13px; 
-    }
+    .top-nav { top: 10px; right: 10px; flex-direction: column;}
+    .logout-btn { padding: 8px 12px; font-size: 13px; }
     .iframe-header { padding: 10px 12px; }
     .back-btn { padding: 8px 14px; font-size: 14px; }
+    .ttk-grid {grid-template-columns: 1fr;}
+    .ttk-tabs {justify-content: center;}
+    .ttk-content-wrapper {padding: 16px 10px;}
   }
 </style>
 </head>
 <body>
 <script src="auth.js?v=101"></script>
  
-<!-- Верхнее меню с кнопками -->
 <div class="top-nav">
   <a href="profile.html" class="logout-btn">📊 Мои результаты</a>
   <button onclick="logoutUser()" class="logout-btn">🚪 Выйти</button>
@@ -182,11 +132,42 @@
   <iframe id="iframe-content" src="about:blank" allow="autoplay"></iframe>
 </div>
 
+<!-- СТРАНИЦА ТТК -->
+<div id="ttk-page">
+  <div class="iframe-header">
+    <button class="back-btn" onclick="closeTTK()">← Назад</button>
+    <div class="iframe-title">🍹 ТТК МиЧ (основные)</div>
+  </div>
+  <div class="ttk-content-wrapper">
+    <div class="ttk-tabs" id="ttk-tabs"></div>
+    <div class="ttk-grid" id="ttk-content"></div>
+  </div>
+</div>
+
 <div class="container">
   <div id="mainContent">
     <div class="header">
       <h1>Школа Барменов "Моряк и Чайка"</h1>
       <p>Все нужные материалы для того чтобы стать квалифицированным барменом МиЧ.<br>Выберите раздел и пройдите тестирование. Результат автоматически отправляется руководителю.</p>
+    </div>
+
+    <!-- ========== РАЗДЕЛ: СПРАВОЧНИКИ ========== -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-icon ttk">🍹</div>
+        <div>
+          <h2>Справочники</h2>
+          <div class="section-sub">Технологические карты и рецептуры</div>
+        </div>
+      </div>
+      <div class="cards">
+        <a href="#" class="card ttk-card-btn" onclick="openTTK(event)">
+          <div class="card-num">📖</div>
+          <h4>ТТК МиЧ (основные)</h4>
+          <p>Полный справочник коктейлей бара с методами, посудой и граммовками.</p>
+          <div class="meta"><span>6 категорий</span></div>
+        </a>
+      </div>
     </div>
 
     <!-- ========== РАЗДЕЛ: ВСТУПЛЕНИЕ ========== -->
@@ -460,12 +441,169 @@
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZTqxuRO5vVcZs5Q9MlPbtPK9gEnMlEWFpJpq3FtQsdi_cPR4y/exec';
 const STORAGE_KEY = 'mich_auth';
 
+// ==========================================
+// БАЗА ДАННЫХ ТТК (Без ТК Коктейли и без P.I.M.P)
+// ==========================================
+const TTK_DATA = {
+  "Морская классика": [
+    { name: "Апероль спритц", method: "Билд", glass: "Винка", desc: "Классический итальянский коктейль. На основе игристого, и цитрусового ликера Апероль.", ing: [["Ликер Апероль", "0.06 л"], ["Вода газированная", "0.03 л"], ["Игристое вино брют", "0.12 л"], ["Фрукты/цитрусы", "0.015 кг"]] },
+    { name: "Ахтерштевень", method: "Шейк", glass: "Рокс", desc: "Вкус сочной клубники, трипл сек и легкой кислинки. Насыщенный абсент добавляет таинственности.", ing: [["Сироп клубника", "0.015 л"], ["Абсент", "0.02 л"], ["Смесь кислот", "0.02 л"], ["Ликер трипл сек", "0.02 л"], ["Фрукты/цитрусы", "0.025 кг"]] },
+    { name: "Б-52", method: "Билд", glass: "Шот", desc: "Не требует описания :)", ing: [["Ликер Бейлис", "0.015 л"], ["Ликер кофе, трипл сек", "0.03 л"]] },
+    { name: "Белый русский", method: "Билд/Стир", glass: "Рокс", desc: "Не требует описания :)", ing: [["Сливки 11%", "0.03 л"], ["Водка Хаус", "0.03 л"], ["Ликер кофе", "0.03 л"]] },
+    { name: "Блади Мэри", method: "Фроулинг", glass: "Хайбол XL", desc: "Классика", ing: [["Сангрита пф МЧ", "0.2 л"], ["Водка Хаус", "0.05 л"], ["Фрукты/цитрусы", "0.02 кг"]] },
+    { name: "Идеальный шторм (негрони)", method: "Билд/Стир", glass: "Рокс", desc: "Негрони. Классика.", ing: [["Идеальный шторм п/ф", "0.1 л"], ["Фрукты/цитрусы", "0.02 кг"]] },
+    { name: "Ковбойский сауэр", method: "Дабл шейк", glass: "Рокс", desc: "Нежный вкус миндаля и свежий апельсин, объединённые с мягкой пенкой из яичного белка.", ing: [["Сироп миндаль", "0.015 л"], ["Сок апельсин", "0.02 л"], ["Яичный белок", "0.02 л"], ["Смесь кислот", "0.015 л"], ["Фрукты/цитрусы", "0.02 кг"], ["Бурбон Хаус", "0.04 л"]] },
+    { name: "Малиновый физ", method: "Шейк", glass: "Хайбол", desc: "Освежающий коктейль на основе джина с насыщенным фруктовым пюре.", ing: [["Джин Хаус", "0.04 л"], ["Пюре малина", "0.04 кг"], ["Сироп маракуйя", "0.02 л"], ["Вода газированная", "0.05 л"], ["Смесь кислот", "0.01 л"], ["Фрукты/цитрусы", "0.02 кг"]] },
+    { name: "Маракуйя спритц", method: "Билд", glass: "Винка", desc: "Искристый, яркий и тропический. Маракуйя даёт сочную кисло-сладкую волну.", ing: [["Сироп Маракуйя", "0.02 л"], ["Сидр Роял", "0.1 л"], ["Фрукты/цитрусы", "0.02 кг"], ["Инфьюзи Маракуйя-Ваниль", "0.04 л"], ["Вода газированная", "0.03 л"]] },
+    { name: "Онли фанс мартини", method: "Шейк", glass: "Шале", desc: "Сладкое манговое пюре в сочетании с игристым вином.", ing: [["Пюре манго", "0.03 кг"], ["Смесь кислот", "0.015 л"], ["Фрукты/цитрусы", "0.025 кг"], ["Водка Хаус", "0.04 л"], ["Вино игристое Хаус", "0.04 л"], ["Сироп Пряный", "0.01 л"]] },
+    { name: "Поднять паруса", method: "Шейк", glass: "Хайбол", desc: "Освежающий сок яблока в сочетании с кислинкой лаймового сиропа и смесью ромов.", ing: [["Сок яблоко", "0.15 л"], ["Сироп лайм", "0.01 л"], ["Смесь ромов пф МЧ", "0.04 л"], ["Смесь кислот", "0.01 л"], ["Фрукты/цитрусы", "0.025 кг"]] },
+    { name: "Hemingway Special", method: "Шейк", glass: "Шале", desc: "Сложный, насыщенный и ярко-балансированный.", ing: [["Смесь ромов пф МЧ", "0.04 л"], ["Сок грейпфрут", "0.03 л"], ["Сироп пряный пф МЧ", "0.01 кг"], ["Ликер мараскино", "0.015 л"], ["Цедра апельсина", "0.01 кг"], ["Смесь кислот", "0.02 л"]] },
+    { name: "Margarita", method: "Шейк", glass: "Шале", desc: "Классика", ing: [["Текила Хаус", "0.05 л"], ["Ликер трипл сек", "0.02 л"], ["Сироп лайм", "0.02 л"], ["Кислота", "0.01 л"]] }
+  ],
+  "Коктейли NEW": [
+    { name: "Авиация", method: "Шейк", glass: "Шале", desc: "Джин в сочетании с нежным фиалковым и насыщенным мараскино ликерами.", ing: [["Джин Хаус", "0.04 л"], ["Ликер фиалка", "0.01 л"], ["Ликер Мараскино", "0.015 л"], ["Смесь кислот", "0.015 л"], ["Вишня коктейльная", "0.005 кг"]] },
+    { name: "Аквамен", method: "Шейк", glass: "Хайбол", desc: "Смесь ромов, сок ананаса и ликер персик — настоящий праздник для вкусовых рецепторов!", ing: [["Аквамен п/ф", "0.095 л"], ["Сок ананас", "0.075 л"]] },
+    { name: "Бульвардье", method: "Шейк", glass: "Шале", desc: "Классика", ing: [["Ликер Кампари", "0.03 л"], ["Бурбон Хаус", "0.03 л"], ["Вермут Мартини", "0.03 л"], ["Цитрусы", "0.015 кг"]] },
+    { name: "Бейзил Кисс", method: "Стир, Стрейн", glass: "Рокс", desc: "-", ing: [["Джин Хаус", "0.05 л"], ["Кордиал Базелик", "0.05 л"], ["Фрукты/цитрусы", "0.002 кг"]] },
+    { name: "Вау Негрони", method: "Стир, Стрейн", glass: "Рокс", desc: "-", ing: [["Джин Хаус", "0.03 л"], ["Ликер Кампари", "0.015 л"], ["Кордиал Гранат Лаванда", "0.03 л"], ["Фрукты/цитрусы", "0.02 кг"], ["Вермут Мартини Россо", "0.015 л"], ["Ароматизатор SlowMo Цедра апельсина", "0.001 л"]] },
+    { name: "Голливуд Сауэр", method: "Шейк, Страйн", glass: "Рокс", desc: "-", ing: [["Бурбон Хаус", "0.04 л"], ["Кордиал Сакура Шисо Медовые соты", "0.04 л"], ["Яичный белок", "0.01 л"], ["Ангостура Биттерс", "0.002 л"], ["Ароматизатор SlowMo Цедра апельсина", "0.001 л"]] },
+    { name: "Красный Бархат", method: "Шейк, Страйн", glass: "Шале", desc: "-", ing: [["Водка Шмидт Черная Смородина", "0.03 л"], ["Вермут Мартини Россо", "0.005 л"], ["Пюре малина", "0.02 кг"], ["Кордиал Красная смородина", "0.025 л"], ["Кордиал Лист Лайма", "0.015 л"], ["Яичный белок", "0.01 л"], ["Фрукты/цитрусы", "0.02 кг"], ["Ароматизатор SlowMo Черная смородина", "0.001 л"]] },
+    { name: "Плей Бой", method: "Билд", glass: "Хайбол", desc: "-", ing: [["Водка Хаус", "0.04 л"], ["Кордиал Земляника", "0.03 л"], ["Кордиал Ананас", "0.02 л"], ["Фрукты/цитрусы", "0.02 кг"], ["Тоник", "0.1 л"], ["Ароматизатор SlowMo Вишня", "0.001 л"]] },
+    { name: "Плыви сама", method: "Шейк", glass: "Шале", desc: "Десертный коктейль на основе смеси ромов с соленой карамелью.", ing: [["Смесь ромов пф МЧ", "0.03 л"], ["Инфьюз Соленая карамель", "0.03 л"], ["Кордиал ананас/лемонграс", "0.007 л"], ["Сироп Гренадин", "0.005 л"], ["Белок", "0.02 л"]] },
+    { name: "Сарти Сприц", method: "Билд", glass: "Винный бокал", desc: "-", ing: [["Ликер Сарти", "0.04 л"], ["Вино игристое Хаус", "0.08 л"], ["Кордиал Манго Маракуйя Сливки", "0.03 л"], ["Вода газированная", "0.03 л"], ["Ароматизатор SlowMo Вишня", "0.001 л"], ["Фрукты/цитрусы", "0.02 кг"]] },
+    { name: "Секс on The city", method: "Шейк, Страйн", glass: "Шале и Шот", desc: "-", ing: [["Водка Шмидт Грейпфрут", "0.03 л"], ["Вермут Мартини драй", "0.005 л"], ["Пюре Маракуйя", "0.02 кг"], ["Кордиал Маракуйя Каламанси Ваниль", "0.04 л"], ["Яичный белок", "0.01 л"], ["Фрукты/цитрусы", "0.02 кг"], ["Вино игристое Хаус", "0.04 л"], ["Ароматизатор SlowMo Цедра апельсина", "0.001 л"]] },
+    { name: "Текила Любовь", method: "Шейк&Стрейн", glass: "Шале", desc: "-", ing: [["Текила Хаус", "0.04 л"], ["Кордиал Вердита", "0.04 л"], ["Сок Грейпфрут", "0.01 л"], ["Сахарный сироп", "0.01 кг"], ["Фрукты/цитрусы", "0.02 кг"], ["Яичный белок", "0.02 л"]] },
+    { name: "Фантазер", method: "Шейк", glass: "Винный бокал", desc: "-", ing: [["Ром Хаус", "0.03 л"], ["Кордиал Момо Слива", "0.03 л"], ["Алоэ с медом", "0.02 кг"], ["Вино игристое Хаус", "0.03 л"], ["Сок ананас", "0.03 л"], ["Яичный белок", "0.02 л"]] },
+    { name: "Шальной круиз", method: "Билд", glass: "Хайбол", desc: "Текила Санрайз - классика", ing: [["Текила Хаус", "0.04 л"], ["Сироп гренадин", "0.015 л"], ["Сок апельсин", "0.15 л"], ["Цитрусы", "0.015 кг"]] },
+    { name: "1001 ночь", method: "Стир", glass: "Кокт. рюмка", desc: "-", ing: [["Slowmo-Жасмин/рислинг", "0.04 л"], ["Джин Хаус", "0.04 л"], ["Ликер Личи", "0.015 л"], ["Совиньон блан", "0.015 л"]] },
+    { name: "Чери Чери Леди (сауэр)", method: "Шейк", glass: "Олд фешн", desc: "-", ing: [["Slowmo-Черешня/Жасмин", "0.04 л"], ["Бурбон Хаус", "0.04 л"], ["Ликер Ред кюрасао", "0.01 л"], ["Микс Кислот", "0.01 л"], ["Белок", "0.01 л"]] },
+    { name: "Грушевый кайфун (сауэр)", method: "Шейк", glass: "Олд фешн", desc: "-", ing: [["Slowmo-Груша/дуб", "0.04 л"], ["Вермут Мартини Россо", "0.01 л"], ["Бурбон Хаус", "0.04 л"], ["Файербол", "0.015 л"], ["Белок", "0.01 л"]] },
+    { name: "Оранж Марго", method: "Стир", glass: "Кокт. рюмка", desc: "-", ing: [["Slowmo-Блад оранж", "0.04 л"], ["Текила Хаус", "0.04 л"], ["Ликер грейпфрут", "0.015 л"]] },
+    { name: "Холс Палома", method: "Билд", glass: "Хайбол", desc: "-", ing: [["Slowmo-Грейпфрут/хмель", "0.04 л"], ["Текила Хаус", "0.04 л"], ["Ликер Трипл сек", "0.01 л"], ["Тоник", "0.1 л"]] }
+  ],
+  "XL": [
+    { name: "Маракуйя спритц XL", method: "Билд", glass: "Винка", desc: "Искристый, яркий и тропический.", ing: [["Сироп Маракуйя", "0.04 л"], ["Сидр Роял", "0.17 л"], ["Фрукты/цитрусы", "0.02 кг"], ["Инфьюзи Маракуйя-Ваниль", "0.08 л"], ["Вода газированная", "0.05 л"]] },
+    { name: "Боцман и кокосы XL", method: "Шейк", glass: "Хайбол XL", desc: "Вкус тропического кокоса, сладкого ананаса и сливок.", ing: [["Смесь ромов пф МЧ", "0.08 л"], ["Сироп кокос", "0.03 л"], ["Сливки 11%", "0.05 л"], ["Сок ананас", "0.15 л"], ["Пюре ананас", "0.05 кг"]] },
+    { name: "Девятый вал XL", method: "Шейк", glass: "Хайбол XL", desc: "Смесь ромов, сочный ананас, манго и ликер персик.", ing: [["Девятый вал п/ф МЧ", "0.12 л"], ["Сок ананас", "0.075 л"]] },
+    { name: "Завтрак на суше XL", method: "Шейк", glass: "Хайбол XL", desc: "Смесь ромов, насыщенный ананас и миндальный сироп.", ing: [["Смесь ромов пф МЧ", "0.09 л"], ["Сироп миндаль", "0.025 л"], ["Сок ананас", "0.1 л"], ["Смесь кислот", "0.015 л"], ["Ликер трипл сек", "0.02 л"], ["Фрукты/цитрусы", "0.015 кг"]] },
+    { name: "Зомби МиЧ XL", method: "Шейк", glass: "Хайбол XL", desc: "Освежающий грейпфрут с нотками миндаля и пряной корицы.", ing: [["Зомби МЧ XL", "0.12 л"], ["Сок грейпфрут", "0.08 л"]] },
+    { name: "Лонг айленд XL", method: "Билд", glass: "Хайбол XL", desc: "Классика", ing: [["Лонг айленд премикс пф МЧ", "0.1 л"], ["Кола/Тоник", "0.12 л"], ["Сахар песок", "0.02 кг"], ["Смесь кислот", "0.03 л"], ["Фрукты/цитрусы", "0.02 кг"]] },
+    { name: "Полундра ХL", method: "Шейк", glass: "Хайбол XL", desc: "Нежный персиковый ликер и сироп создают сладкую основу.", ing: [["Ликер персик", "0.03 л"], ["Сироп персик", "0.01 л"], ["Сок ананас", "0.1 л"], ["Ром Хаус", "0.06 л"], ["Смесь кислот", "0.02 л"], ["Фрукты/цитрусы", "0.015 кг"]] },
+    { name: "Текила Любовь XL", method: "Шейк&Стрейн", glass: "Хайбол XL", desc: "-", ing: [["Текила Любовь XL", "0.12 л"], ["Сок Грейпфрут", "0.02 л"], ["Яичный белок", "0.02 л"]] },
+    { name: "Красный Бархат XL", method: "Шейк, Страйн", glass: "Хайбол XL", desc: "Мотивация", ing: [["Красный Бархат XL", "0.125 л"], ["Пюре малина", "0.03 кг"], ["Яичный белок", "0.02 л"]] },
+    { name: "Секс на пляже XL", method: "Шейк, Страйн", glass: "Хайбол XL", desc: "Мотивация", ing: [["Секс на пляже п/ф", "0.11 л"], ["Сок Ананас", "0.06 л"]] },
+    { name: "Алые паруса", method: "Дабл шейк", glass: "Рокс", desc: "Вкус нежной настойки на малине и джина \"Barrister B47\" и ароматного шалфея.", ing: [["Алые паруса п/ф", "0.09 л"], ["Пюре малина", "0.015 кг"], ["Яичный белок", "0.02 л"]] }
+  ],
+  "Горячие": [
+    { name: "Глинтвейн красный", method: "-", glass: "Айриш", desc: "Теплый ароматный напиток с красным вином и специями.", ing: [["Вино Фиорино Д,оро 3л", "0.15 л"], ["Сироп медовый", "0.025 л"], ["Цитрусы", "0.02 кг"], ["Корица", "0.005 кг"], ["Гвоздика", "0.001 кг"]] },
+    { name: "Яблочный тодди", method: "-", glass: "Айриш", desc: "-", ing: [["Бурбон Хаус", "0.04 л"], ["Кордиал эстрогон яблоко", "0.05 л"], ["Сок яблоко", "0.05 л"]] },
+    { name: "Грог", method: "-", glass: "Айриш", desc: "-", ing: [["Смесь ромов п/ф", "0.04 л"], ["Кордиал черешня жасмин", "0.05 л"], ["Сок вишня", "0.05 л"]] }
+  ],
+  "Сезонка": [
+    { name: "За деньги Да", method: "Билд", glass: "Винка", desc: "Искристое вино с ярким вкусом малины и клубники, дополненное аперолем.", ing: [["Ликер Апероль", "0.03 л"], ["Вино игристое Хаус", "0.1 л"], ["Пюре малина", "0.03 кг"], ["Сироп клубника", "0.01 л"], ["Вода газированная", "0.03 л"]] },
+    { name: "Царица", method: "Билд", glass: "Винка", desc: "Джин в сочетании с маракуйевым пюре и яблочным сиропом.", ing: [["Джин Хаус", "0.03 л"], ["Игристое вино брют", "0.075 л"], ["Пюре маракуйя", "0.03 кг"], ["Сироп яблоко", "0.02 л"], ["Вода газированная", "0.03 л"]] },
+    { name: "Эпл Спритц", method: "Билд", glass: "Винка", desc: "-", ing: [["Slowmo-Эстрагон/яблоко/алоэ", "0.04 л"], ["Джин Хаус", "0.02 л"], ["Вермут экстра драй", "0.04 л"], ["Ликер яблоко", "0.015 л"], ["Игристое Хаус", "0.05 л"]] }
+  ],
+  "Прекмиксы": [
+    { name: "Аквамен п/ф", desc: "Смесь ромов, ликер персик, сироп яблоко, кислота.", ing: [["Смесь ромов пф МЧ", "-"], ["Ликер персик", "-"], ["Сироп яблоко", "-"], ["Смесь кислот", "-"]] },
+    { name: "Девятый вал п/ф МЧ", desc: "Смесь ромов, абсент, ликер персик, сироп манго, гренадин, кислота.", ing: [["Смесь ромов пф МЧ", "-"], ["Абсент", "-"], ["Ликер персик", "-"], ["Сироп манго", "-"], ["Сироп гренадин", "-"], ["Смесь кислот", "-"]] },
+    { name: "Лонг айленд премикс п/ф МЧ", desc: "Ликер Хаус, Джин, Текила, Ром, Водка.", ing: [["Ликер Хаус", "-"], ["Джин Хаус", "-"], ["Текила Хаус", "-"], ["Ром Хаус", "-"], ["Водка Хаус", "-"]] },
+    { name: "Сангрита пф МЧ", desc: "Томатный сок, Табаско, Шри-Рача, жидкий дым, фреш, паприка, сахар, специи, бульон.", ing: [["Сок томат", "-"], ["Табаско", "-"], ["Шри-Рача", "-"], ["Жидкий дым", "-"], ["Фреш лимон/лайм", "-"], ["Паприка копчёная", "-"], ["Сахар", "-"], ["Приправа Мексика", "-"], ["Бульон", "-"]] },
+    { name: "Идеальный шторм п/ф МЧ", desc: "Джин, Кампари, Вермут Мартини.", ing: [["Джин Хаус", "-"], ["Ликер Кампари", "-"], ["Вермут Мартини", "-"]] },
+    { name: "Зомби МЧ XL", desc: "Сироп миндаль, гренадин, кислота, ром, пряный сироп.", ing: [["Сироп миндаль", "-"], ["Сироп гренадин", "-"], ["Смесь кислот", "-"], ["Ром Хаус", "-"], ["Сироп Пряный", "-"]] },
+    { name: "Алые паруса", desc: "Инфьюз Малина-Шалфей, Джин, кислота, пряный сироп.", ing: [["Инфьюзи Малина-Шалфей", "-"], ["Джин Хаус", "-"], ["Смесь кислот", "-"], ["Сироп Пряный", "-"]] },
+    { name: "Текила Любовь XL", desc: "Текила, Кордиал Вердита, сахарный сироп.", ing: [["Текила Хаус", "-"], ["Кордиал Вердита", "-"], ["Сахарный сироп", "-"]] },
+    { name: "Красный Бархат XL", desc: "Водка Шмидт, Вермут Россо, Кордиал Смородина, Кордиал Лайм.", ing: [["Водка Шмидт Черная Смородина", "-"], ["Вермут Мартини Россо", "-"], ["Кордиал Красная смородина", "-"], ["Кордиал Лист Лайма", "-"]] },
+    { name: "Секс на пляже п/ф", desc: "Водка, Кордиал Смородина, Ликер Персик.", ing: [["Водка Хаус", "-"], ["Кордиал Красная смородина", "-"], ["Ликер Персик", "-"]] }
+  ]
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   loadTimers();
   setupIframeLinks();
+  initTTK();
 });
 
-// ФУНКЦИЯ ВЫХОДА
+// ==== ИНИЦИАЛИЗАЦИЯ ТТК ====
+function initTTK() {
+  const tabsContainer = document.getElementById('ttk-tabs');
+  const contentContainer = document.getElementById('ttk-content');
+  const sheets = Object.keys(TTK_DATA);
+
+  sheets.forEach((sheet, index) => {
+    const btn = document.createElement('button');
+    btn.className = 'ttk-tab' + (index === 0 ? ' active' : '');
+    btn.textContent = sheet;
+    btn.onclick = () => {
+      document.querySelectorAll('.ttk-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTTK(sheet);
+    };
+    tabsContainer.appendChild(btn);
+  });
+
+  renderTTK(sheets[0]);
+}
+
+function renderTTK(sheetName) {
+  const container = document.getElementById('ttk-content');
+  const items = TTK_DATA[sheetName];
+  container.innerHTML = '';
+
+  if (!items || items.length === 0) {
+    container.innerHTML = '<div class="empty">Нет данных</div>';
+    return;
+  }
+
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'ttk-card';
+
+    let html = `<h4>${item.name}</h4>`;
+    
+    if (item.method || item.glass) {
+      html += `<div class="ttk-meta">`;
+      if (item.method && item.method !== '-') html += `<span class="ttk-badge">${item.method}</span>`;
+      if (item.glass && item.glass !== '-') html += `<span class="ttk-badge glass">${item.glass}</span>`;
+      html += `</div>`;
+    }
+
+    if (item.desc && item.desc !== '-') {
+      html += `<div class="ttk-desc">${item.desc}</div>`;
+    }
+
+    if (item.ing && item.ing.length > 0) {
+      html += `<div class="ttk-ingredients">`;
+      item.ing.forEach(ing => {
+        html += `<div class="ttk-ing-row">
+          <span class="ttk-ing-name">${ing[0]}</span>
+          <span class="ttk-ing-weight">${ing[1]}</span>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+
+    card.innerHTML = html;
+    container.appendChild(card);
+  });
+}
+
+// ==== ЛОГИКА ОТКРЫТИЯ / ЗАКРЫТИЯ ====
+function openTTK(e) {
+  if (e) e.preventDefault();
+  document.getElementById('ttk-page').classList.add('active');
+  history.pushState({ ttk: true }, '', '#ttk');
+}
+
+function closeTTK() {
+  document.getElementById('ttk-page').classList.remove('active');
+  if (history.state && history.state.ttk) {
+    history.back();
+  }
+}
+
+// ==========================================
+
 function logoutUser() {
   if (confirm('Вы уверены, что хотите выйти?')) {
     localStorage.removeItem('mich_user');
@@ -473,13 +611,15 @@ function logoutUser() {
   }
 }
 
-// ПЕРЕХВАТ КЛИКОВ ПО КАРТОЧКАМ (Открытие в iframe)
 function setupIframeLinks() {
   const modal = document.getElementById('iframe-modal');
   const iframe = document.getElementById('iframe-content');
   const titleEl = document.getElementById('iframe-title');
 
   document.querySelectorAll('a.card').forEach(card => {
+    // Игнорируем карточку ТТК, так как для нее своя логика
+    if (card.classList.contains('ttk-card-btn')) return;
+
     card.addEventListener('click', (e) => {
       const href = card.getAttribute('href');
       if (!href || href.startsWith('#')) return;
@@ -504,10 +644,17 @@ function setupIframeLinks() {
     }
   };
 
+  // Закрываем модалки и ТТК при кнопке "Назад" в браузере
   window.addEventListener('popstate', (e) => {
+    const modal = document.getElementById('iframe-modal');
+    const ttkPage = document.getElementById('ttk-page');
+    
     if (modal.classList.contains('active')) {
       modal.classList.remove('active');
       iframe.src = 'about:blank';
+    }
+    if (ttkPage.classList.contains('active')) {
+      ttkPage.classList.remove('active');
     }
   });
 }
