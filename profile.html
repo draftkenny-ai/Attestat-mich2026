@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мои результаты — МиЧ КМ</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:linear-gradient(160deg,#4a90d9 0%,#2c5f8d 60%,#1e466b 100%);min-height:100vh;padding:24px 20px;color:#1a1a1a}
+  .container{max-width:900px;margin:0 auto}
+  
+  .header{display:flex;justify-content:space-between;align-items:center;color:#fff;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+  .header h1{font-size:26px;font-weight:800;letter-spacing:-.5px}
+  .btn-back{background:rgba(255,255,255,0.2);color:#fff;text-decoration:none;padding:10px 20px;border-radius:10px;font-weight:600;transition:.2s;display:inline-block}
+  .btn-back:hover{background:rgba(255,255,255,0.3);transform:translateX(-3px)}
+
+  .user-card{background:#fff;border-radius:20px;padding:24px 28px;box-shadow:0 10px 32px rgba(0,0,0,.15);margin-bottom:24px;display:flex;align-items:center;gap:20px}
+  .user-avatar{width:64px;height:64px;border-radius:50%;background:#eef4fb;color:#4a90d9;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800}
+  .user-info h2{font-size:20px;font-weight:800;margin-bottom:4px;color:#1a1a1a}
+  .user-info p{font-size:14px;color:#666}
+  .user-stats{display:flex;gap:20px;margin-left:auto}
+  .stat-box{text-align:center}
+  .stat-box .val{font-size:22px;font-weight:800;color:#4a90d9}
+  .stat-box .lbl{font-size:12px;color:#888;text-transform:uppercase;font-weight:600}
+
+  .results-card{background:#fff;border-radius:20px;padding:24px 28px;box-shadow:0 10px 32px rgba(0,0,0,.15)}
+  .results-card h3{font-size:18px;font-weight:800;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid #eef2f7}
+  
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;padding:12px 10px;font-size:13px;color:#666;font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #eef2f7}
+  td{padding:14px 10px;border-bottom:1px solid #eee;font-size:14px}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:#f8fafc}
+  
+  .grade{display:inline-block;min-width:34px;text-align:center;padding:5px 10px;border-radius:8px;font-weight:800;color:#fff;font-size:14px}
+  .grade-5{background:#28a745}
+  .grade-4{background:#5cb85c}
+  .grade-3{background:#f0ad4e}
+  .grade-2{background:#d9534f}
+  
+  .empty{text-align:center;padding:40px;color:#888;font-size:15px;background:#f8fafc;border-radius:12px;border:2px dashed #d0d7de}
+
+  @media (max-width:600px){
+    .user-card{flex-direction:column;text-align:center;gap:12px}
+    .user-stats{margin-left:0;width:100%;justify-content:center;margin-top:10px}
+    table{display:block;overflow-x:auto}
+  }
+</style>
+</head>
+<body>
+  <script src="auth.js?v=101"></script>
+
+<div class="container">
+  <div class="header">
+    <h1>📊 Мои результаты</h1>
+    <a href="index.html" class="btn-back">← На главную</a>
+  </div>
+
+  <!-- Карточка пользователя -->
+  <div class="user-card">
+    <div class="user-avatar" id="user-initial">?</div>
+    <div class="user-info">
+      <h2 id="user-name">Загрузка...</h2>
+      <p id="user-bar">—</p>
+    </div>
+    <div class="user-stats">
+      <div class="stat-box">
+        <div class="val" id="stat-total">0</div>
+        <div class="lbl">Тестов пройдено</div>
+      </div>
+      <div class="stat-box">
+        <div class="val" id="stat-avg">0%</div>
+        <div class="lbl">Средний балл</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Таблица результатов -->
+  <div class="results-card">
+    <h3>История прохождений</h3>
+    <div id="results-container">
+      <div class="empty">Загрузка данных...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZTqxuRO5vVcZs5Q9MlPbtPK9gEnMlEWFpJpq3FtQsdi_cPR4y/exec';
+const USER_KEY = 'mich_user';
+
+// Ждем, пока auth.js подгрузит данные пользователя
+const checkUserInterval = setInterval(() => {
+  const user = JSON.parse(localStorage.getItem(USER_KEY) || 'null');
+  if (user && user.status === 'approved') {
+    clearInterval(checkUserInterval);
+    initProfile(user);
+  }
+}, 100);
+
+function initProfile(user) {
+  // Заполняем шапку профиля
+  document.getElementById('user-name').textContent = user.name;
+  document.getElementById('user-bar').textContent = `Бар: ${user.bar || '—'}`;
+  document.getElementById('user-initial').textContent = user.name.charAt(0).toUpperCase();
+
+  // Запрашиваем результаты
+  const url = `${WEB_APP_URL}?action=getUserResults&userId=${encodeURIComponent(user.id)}&token=${encodeURIComponent(user.token)}`;
+  
+  jsonp(url, (data) => {
+    const container = document.getElementById('results-container');
+    
+    if (!data || data.error || !data.results) {
+      container.innerHTML = '<div class="empty">Не удалось загрузить результаты</div>';
+      return;
+    }
+
+    if (data.results.length === 0) {
+      container.innerHTML = '<div class="empty">Вы пока не прошли ни одного теста.</div>';
+      return;
+    }
+
+    // Считаем статистику
+    let totalPct = 0;
+    data.results.forEach(r => { totalPct += parseInt(r.pct) || 0; });
+    const avg = Math.round(totalPct / data.results.length);
+
+    document.getElementById('stat-total').textContent = data.results.length;
+    document.getElementById('stat-avg').textContent = `${avg}%`;
+
+    // Рендерим таблицу
+    let html = `
+      <table>
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Название теста</th>
+            <th>Баллы</th>
+            <th>Оценка</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    // Переворачиваем массив, чтобы новые результаты были сверху
+    data.results.reverse().forEach(r => {
+      // Форматируем дату (если она приходит в сыром виде)
+      let dateStr = r.date;
+      if (dateStr.includes('T')) {
+        dateStr = new Date(dateStr).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      }
+
+      html += `
+        <tr>
+          <td style="color:#888;font-size:13px">${dateStr}</td>
+          <td style="font-weight:600">${r.test}</td>
+          <td style="font-weight:700;color:#4a90d9">${r.pct}</td>
+          <td><span class="grade grade-${r.grade}">${r.grade}</span></td>
+        </tr>
+      `;
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+  });
+}
+
+function jsonp(url, callback) {
+  const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  window[cbName] = (data) => {
+    callback(data);
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+  };
+  const script = document.createElement('script');
+  script.src = url + '&callback=' + cbName;
+  script.onerror = () => callback(null);
+  document.body.appendChild(script);
+  setTimeout(() => { if (window[cbName]) { callback(null); delete window[cbName]; } }, 8000);
+}
+</script>
+</body>
+</html>
