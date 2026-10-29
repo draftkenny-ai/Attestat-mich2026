@@ -61,7 +61,34 @@
   .footer a {color: #fff;text-decoration: none;background: rgba(255, 255, 255, 0.15);padding: 8px 18px;border-radius: 8px;display: inline-block;margin-top: 12px;font-weight: 600;font-size: 13px;transition: background 0.2s, transform 0.2s;}
   .footer a:hover {background: rgba(255, 255, 255, 0.25);transform: translateY(-2px);}
 
-  .logout-btn {position: fixed;top: 15px;right: 15px;z-index: 9999;background: rgba(255,255,255,0.2);color: #fff;border: 1px solid rgba(255,255,255,0.4);padding: 8px 16px;border-radius: 8px;font-weight: 600;cursor: pointer;backdrop-filter: blur(4px);transition: 0.2s;font-family: inherit;font-size: 14px;}
+  /* =========================================
+     ВЕРХНЕЕ МЕНЮ (Кнопки профиля и выхода)
+     ========================================= */
+  .top-nav {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 9999;
+    display: flex;
+    gap: 10px;
+  }
+  .logout-btn {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: 0.2s;
+    font-family: inherit;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
   .logout-btn:hover {background: rgba(255,255,255,0.3);}
 
   /* =========================================
@@ -122,16 +149,29 @@
     .section-icon{width:40px;height:40px;font-size:20px}
     .cards{grid-template-columns:1fr}
     .card{padding:16px}
-    .logout-btn { top: 10px; right: 10px; padding: 6px 12px; font-size: 12px; }
+    
+    .top-nav { 
+      top: 10px; 
+      right: 10px; 
+      flex-direction: column; /* На телефоне кнопки встанут друг под другом */
+    }
+    .logout-btn { 
+      padding: 8px 12px; 
+      font-size: 13px; 
+    }
     .iframe-header { padding: 10px 12px; }
     .back-btn { padding: 8px 14px; font-size: 14px; }
   }
 </style>
 </head>
 <body>
-<script src="auth.js?v=100"></script>
+<script src="auth.js?v=101"></script>
  
- <button onclick="logoutUser()" class="logout-btn">🚪 Выйти</button>
+<!-- Верхнее меню с кнопками -->
+<div class="top-nav">
+  <a href="profile.html" class="logout-btn">📊 Мои результаты</a>
+  <button onclick="logoutUser()" class="logout-btn">🚪 Выйти</button>
+</div>
 
 <!-- МОДАЛЬНОЕ ОКНО ДЛЯ ТЕСТОВ И ЛЕКЦИЙ -->
 <div id="iframe-modal">
@@ -139,7 +179,6 @@
     <button class="back-btn" onclick="closeIframe()">← Назад</button>
     <div class="iframe-title" id="iframe-title">Загрузка...</div>
   </div>
-  <!-- Здесь будет открываться тест или лекция -->
   <iframe id="iframe-content" src="about:blank" allow="autoplay"></iframe>
 </div>
 
@@ -423,7 +462,7 @@ const STORAGE_KEY = 'mich_auth';
 
 document.addEventListener('DOMContentLoaded', () => {
   loadTimers();
-  setupIframeLinks(); // Подключаем перехват кликов
+  setupIframeLinks();
 });
 
 // ФУНКЦИЯ ВЫХОДА
@@ -434,7 +473,7 @@ function logoutUser() {
   }
 }
 
-// ПЕРЕХВАТ КЛИКОВ ПО КАРТОЧКАМ
+// ПЕРЕХВАТ КЛИКОВ ПО КАРТОЧКАМ (Открытие в iframe)
 function setupIframeLinks() {
   const modal = document.getElementById('iframe-modal');
   const iframe = document.getElementById('iframe-content');
@@ -442,38 +481,29 @@ function setupIframeLinks() {
 
   document.querySelectorAll('a.card').forEach(card => {
     card.addEventListener('click', (e) => {
-      // Если у карточки есть атрибут data-topic или это ссылка на файл
       const href = card.getAttribute('href');
       if (!href || href.startsWith('#')) return;
       
-      // Блокируем стандартный переход по ссылке
       e.preventDefault();
       
-      // Получаем название лекции/теста
       const title = card.querySelector('h4').innerText;
       titleEl.innerText = title;
       
-      // Загружаем контент в iframe
       iframe.src = href;
-      
-      // Показываем модальное окно
       modal.classList.add('active');
       
-      // Меняем URL в браузере (чтобы кнопка "Назад" в браузере тоже работала)
       history.pushState({ modal: true }, '', '#open');
     });
   });
 
-  // Функция закрытия модального окна
   window.closeIframe = function() {
     modal.classList.remove('active');
-    iframe.src = 'about:blank'; // Останавливаем видео/тесты
+    iframe.src = 'about:blank';
     if (history.state && history.state.modal) {
-      history.back(); // Убираем #open из URL
+      history.back();
     }
   };
 
-  // Обработка кнопки "Назад" в браузере
   window.addEventListener('popstate', (e) => {
     if (modal.classList.contains('active')) {
       modal.classList.remove('active');
