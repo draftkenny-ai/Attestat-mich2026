@@ -6,17 +6,24 @@
   const page = location.pathname.split('/').pop() || 'index.html';
   const isRegisterPage = page === 'register.html';
   const isAdminPage    = page === 'admin.html';
-  const isIframe = window.top !== window.self;
 
   if (isRegisterPage || isAdminPage) return;
+
+  // Защита от кнопки "Назад" (чтобы не открывалась страница из кэша)
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) location.reload();
+  });
+
+  const isIframe = window.top !== window.self;
+
+  // СКРЫВАЕМ КОНТЕНТ ВСЕГДА (даже в iframe), пока не проверим доступ
+  document.documentElement.style.display = 'none';
 
   function goToLogin() {
     try { localStorage.removeItem(KEY); } catch(e) {}
     if (isIframe) window.top.location.href = 'register.html';
     else location.replace('register.html');
   }
-
-  if (!isIframe) document.documentElement.style.display = 'none';
 
   let user = null;
   try { user = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) {}
@@ -41,16 +48,13 @@
     delete window[cbName];
     
     if (data && data.valid) {
-      if (!isIframe) document.documentElement.style.display = 'block';
-      
-      // Если сервер вернул права (даже пустой объект), принудительно обновляем их
+      // Принудительно обновляем права из базы (даже если это пустой объект)
       if (data.access !== undefined) {
         user.access = data.access;
         localStorage.setItem(KEY, JSON.stringify(user));
       }
       
-      console.log("Текущие права пользователя:", user.access); // Для отладки
-      
+      document.documentElement.style.display = 'block';
       setupPage(user);
     } else {
       redirectToLogin();
@@ -67,12 +71,9 @@
 
     const testPages = ['test1.html','test2.html','test3.html','service.html','alco1.html','alco2.html','alco3.html','beer1.html','tincture1.html','reg-bar-test.html','reg-urv-test.html','reg-tincture-test.html','final-attestation.html'];
     
-    // Защита прямых ссылок на тесты
     if (testPages.includes(page)) {
       const topicId = page.replace('.html', '');
       let hasAccess = false;
-      
-      // Строгая проверка: доступ есть ТОЛЬКО если в объекте явно указано true
       if (user.access && user.access.all === true) hasAccess = true;
       else if (user.access && user.access[topicId] === true) hasAccess = true;
 
@@ -95,7 +96,6 @@
         if (hint) hint.textContent = `Вы вошли как ${user.name} · ${user.bar || ''}`;
       }
 
-      // Блокировка карточек на главной
       if (!isIframe && (page === 'index.html' || page === '')) {
         const allCards = document.querySelectorAll('a.card');
         allCards.forEach(card => {
@@ -108,7 +108,6 @@
 
           if (topicId) {
             let hasAccess = false;
-            // Строгая проверка: доступ есть ТОЛЬКО если в объекте явно указано true
             if (user.access && user.access.all === true) hasAccess = true;
             else if (user.access && user.access[topicId] === true) hasAccess = true;
 
