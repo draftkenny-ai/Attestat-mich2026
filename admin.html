@@ -372,21 +372,18 @@ function formatBirthdate(dateStr) {
   if (!dateStr) return '—';
   let str = String(dateStr).trim();
   
-  // Если пришла строка формата ISO (содержит 'T'), отрезаем время
   if (str.includes('T')) {
     str = str.split('T')[0];
   }
   
-  // Разделяем по дефису (ГГГГ-ММ-ДД)
   const parts = str.split('-');
   if (parts.length === 3) {
     if (parts[0].length === 4) {
-      // Меняем порядок на ДД-ММ-ГГГГ
       return `${parts[2]}-${parts[1]}-${parts[0]}`;
     }
   }
   
-  return str; // Если формат неизвестен, возвращаем как есть
+  return str;
 }
 
 function loadUsers() {
@@ -437,12 +434,14 @@ function renderUsersTable() {
       `;
     } else if (u.status === 'approved') {
       actions = `
-        <button onclick="editUserName('${u.id}','${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#f0ad4e;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">✏️ Изменить ФИО</button>
+        <button onclick="editUserName('${u.id}','${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#f0ad4e;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">✏️ ФИО</button>
+        <button onclick="adminChangePassword('${u.id}', '${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">🔑 Пароль</button>
         <button onclick="setUserStatus('${u.id}','blocked')" style="padding:6px 10px;background:#6c757d;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🚫 Блок</button>
       `;
     } else if (u.status === 'blocked') {
       actions = `
         <button onclick="setUserStatus('${u.id}','approved')" style="padding:6px 10px;background:#28a745;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">✅ Разблокировать</button>
+        <button onclick="adminChangePassword('${u.id}', '${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">🔑 Пароль</button>
         <button onclick="setUserStatus('${u.id}','deleted')" style="padding:6px 10px;background:#d9534f;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🗑 Удалить</button>
       `;
     }
@@ -482,6 +481,29 @@ function editUserName(userId, currentName) {
   jsonp(url, (data) => {
     if (data && data.success) { showToast('✅ ФИО обновлено'); loadUsers(); }
     else showToast('❌ Ошибка');
+  });
+}
+
+function adminChangePassword(userId, userName) {
+  const newPass = prompt(`Введите новый пароль для сотрудника: ${userName}\n\n(Минимум 6 символов)`);
+  
+  if (newPass === null) return; 
+  
+  if (newPass.trim().length < 6) {
+    alert('Ошибка: пароль должен быть не менее 6 символов!');
+    return;
+  }
+
+  const url = WEB_APP_URL + '?action=adminSetPassword&pwd=' + encodeURIComponent(currentPwd) + 
+              '&userId=' + encodeURIComponent(userId) + 
+              '&newPassword=' + encodeURIComponent(newPass.trim());
+              
+  jsonp(url, (data) => {
+    if (data && data.success) {
+      showToast('✅ Пароль успешно изменён!');
+    } else {
+      showToast('❌ ' + (data.error || 'Ошибка смены пароля'));
+    }
   });
 }
 
