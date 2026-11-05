@@ -283,7 +283,6 @@ function showTab(name, btn) {
    РЕЗУЛЬТАТЫ И НАСТРОЙКИ
    ============================================================ */
 
-// Хелпер для правильного парсинга процентов (превращает 0.78 в 78)
 function parsePercent(val) {
   if (val === undefined || val === null || val === '') return 0;
   let num = parseFloat(String(val).replace('%', '').replace(',', '.'));
@@ -292,7 +291,6 @@ function parsePercent(val) {
   return Math.round(num);
 }
 
-// Новая система оценок
 function calculateGrade(pct) {
   if (pct > 90) return 5;
   if (pct > 85) return 4;
@@ -300,7 +298,6 @@ function calculateGrade(pct) {
   return 2;
 }
 
-// Форматирование даты в ДД.ММ.ГГГГ ЧЧ:ММ
 function formatDate(dateStr) {
   if (!dateStr) return '—';
   
@@ -517,21 +514,26 @@ function renderUsersTable() {
     let actions = '';
     if (u.status === 'pending') {
       actions = `
-        <button onclick="setUserStatus('${u.id}','approved')" style="padding:6px 10px;background:#28a745;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">✅ Одобрить</button>
-        <button onclick="setUserStatus('${u.id}','deleted')" style="padding:6px 10px;background:#d9534f;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🗑 Удалить</button>
+        <div style="display:flex; gap:4px; white-space:nowrap;">
+          <button onclick="setUserStatus('${u.id}','approved')" style="padding:6px 10px;background:#28a745;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Одобрить">✅</button>
+          <button onclick="setUserStatus('${u.id}','deleted')" style="padding:6px 10px;background:#d9534f;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Удалить">🗑</button>
+        </div>
       `;
     } else if (u.status === 'approved') {
-      // ОБНОВЛЕННЫЙ БЛОК: только эмодзи, порядок Блок -> ФИО -> Пароль
       actions = `
-        <button onclick="setUserStatus('${u.id}','blocked')" style="padding:6px 10px;background:#6c757d;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">🚫</button>
-        <button onclick="editUserName('${u.id}','${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#f0ad4e;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">✏️</button>
-        <button onclick="adminChangePassword('${u.id}', '${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🔑</button>
+        <div style="display:flex; gap:4px; white-space:nowrap;">
+          <button onclick="setUserStatus('${u.id}','blocked')" style="padding:6px 10px;background:#6c757d;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Заблокировать">🚫</button>
+          <button onclick="editUserName('${u.id}','${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#f0ad4e;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Изменить ФИО">✏️</button>
+          <button onclick="adminChangePassword('${u.id}', '${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Сменить пароль">🔑</button>
+        </div>
       `;
     } else if (u.status === 'blocked') {
       actions = `
-        <button onclick="setUserStatus('${u.id}','approved')" style="padding:6px 10px;background:#28a745;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">✅ Разблокировать</button>
-        <button onclick="adminChangePassword('${u.id}', '${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">🔑 Пароль</button>
-        <button onclick="setUserStatus('${u.id}','deleted')" style="padding:6px 10px;background:#d9534f;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🗑 Удалить</button>
+        <div style="display:flex; gap:4px; white-space:nowrap;">
+          <button onclick="setUserStatus('${u.id}','approved')" style="padding:6px 10px;background:#28a745;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Разблокировать">✅</button>
+          <button onclick="adminChangePassword('${u.id}', '${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Сменить пароль">🔑</button>
+          <button onclick="setUserStatus('${u.id}','deleted')" style="padding:6px 10px;background:#d9534f;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Удалить">🗑</button>
+        </div>
       `;
     }
 
