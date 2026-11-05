@@ -212,9 +212,9 @@ function submit(isAuto) {
   const total = Q.length;
   const pct = Math.round((score / total) * 100);
   let grade;
-  if (pct >= 90) grade = 5;
-  else if (pct >= 75) grade = 4;
-  else if (pct >= 60) grade = 3;
+  if (pct > 90) grade = 5;
+  else if (pct > 85) grade = 4;
+  else if (pct > 75) grade = 3;
   else grade = 2;
 
   const payload = {
