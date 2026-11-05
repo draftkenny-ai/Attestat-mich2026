@@ -77,8 +77,9 @@
       if (user.access.all === true) return true;
       
       // Проверка на новые глобальные галочки
+      if (topicId === 'final-attestation' && user.access.final_all === true) return true;
       if (topicId.startsWith('lec_') && user.access.lec_all === true) return true;
-      if (!topicId.startsWith('lec_') && user.access.test_all === true) return true;
+      if (!topicId.startsWith('lec_') && topicId !== 'final-attestation' && user.access.test_all === true) return true;
 
       // Индивидуальные разрешения (если кто-то выдавал точечно)
       return user.access[topicId] === true;
