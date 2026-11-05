@@ -69,7 +69,7 @@
   function setupPage(user) {
     window.MICH_USER = user;
 
-    // ДОБАВЛЕН ТЕСТ ПО КОМПЛИМЕНТАМ
+    // ДОБАВЛЕНЫ ВСЕ ТЕСТЫ, ВКЛЮЧАЯ НЕПЛАТЕЛЬЩИКОВ
     const testPages = [
       'test1.html', 'test2.html', 'test3.html', 
       'service.html', 
@@ -77,6 +77,7 @@
       'beer1.html', 'tincture1.html', 
       'reg-bar-test.html', 'reg-urv-test.html', 'reg-tincture-test.html', 
       'reg-compliments-test.html', 
+      'reg-nonpayers-test.html',
       'final-attestation.html'
     ];
     
