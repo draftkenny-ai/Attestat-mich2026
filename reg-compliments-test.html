@@ -47,7 +47,7 @@
 
 <div class="note">
   <b>Инструкция:</b> укажите ФИО и нажмите «Начать тест». Отметьте один ответ в каждом вопросе и нажмите «Сдать тест».
-  По истечении времени тест сдаётся автоматически. Оценка: 90–100% — «5», 75–89% — «4», 60–74% — «3», менее 60% — «2».
+  По истечении времени тест сдаётся автоматически. Оценка: 90–100% — «5», 85–89% — «4», 75–84% — «3», менее 75% — «2».
 </div>
 
 <div class="name-block" id="nameBlock">
@@ -196,9 +196,9 @@ function submit(isAuto) {
   const total = Q.length;
   const pct = Math.round((score / total) * 100);
   let grade;
-  if (pct >= 90) grade = 5;
-  else if (pct >= 75) grade = 4;
-  else if (pct >= 60) grade = 3;
+  if (pct > 90) grade = 5;
+  else if (pct > 85) grade = 4;
+  else if (pct > 75) grade = 3;
   else grade = 2;
 
   const payload = {
