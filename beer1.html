@@ -198,7 +198,16 @@ function submit(isAuto) {
     const userAns = selected ? +selected.value : -1;
     const isCorrect = userAns === q.a;
     if (isCorrect) score++;
-    details.push(`${i + 1}. ${q.q}\nОтвет: ${userAns >= 0 ? q.o[userAns] : '—'}\nПравильный: ${q.o[q.a]}\n${isCorrect ? '✅ Верно' : '❌ Ошибка'}`);
+
+    // В details попадают ТОЛЬКО ошибки
+    if (!isCorrect) {
+      details.push(
+        `№${i + 1}. ${q.q}\n` +
+        `Ответ: ${userAns >= 0 ? q.o[userAns] : '— (нет ответа)'}\n` +
+        `Правильный: ${q.o[q.a]}`
+      );
+    }
+
     q.o.forEach((opt, j) => {
       const optLabel = document.getElementById(`q${i}o${j}`);
       optLabel.querySelector('input').disabled = true;
@@ -208,6 +217,11 @@ function submit(isAuto) {
     });
   });
   submitted = true;
+
+  // Если ошибочных нет — добавим явную пометку
+  if (details.length === 0) {
+    details.push('✅ Все ответы верные — ошибок нет.');
+  }
 
   const total = Q.length;
   const pct = Math.round((score / total) * 100);
@@ -232,7 +246,7 @@ function submit(isAuto) {
 
   const res = document.getElementById('result');
   res.style.display = 'block';
-  res.className = 'result ' + (pct >= 60 ? 'pass' : 'fail');
+  res.className = 'result ' + (pct > 75 ? 'pass' : 'fail');
   res.innerHTML = `Результат: ${score} из ${total} (${pct}%) — оценка «${grade}»<small>${isAuto ? '⏰ Тест сдан автоматически. ' : ''}Результат отправлен руководителю.</small>`;
 
   document.getElementById('submitBtn').style.display = 'none';
