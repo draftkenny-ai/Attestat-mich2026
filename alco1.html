@@ -47,7 +47,7 @@
 
 <div class="note">
   <b>Инструкция:</b> укажите ФИО и нажмите «Начать тест». Отметьте один ответ в каждом вопросе и нажмите «Сдать тест».
-  По истечении времени тест сдаётся автоматически. Оценка: 90–100% — «5», 75–89% — «4», 60–74% — «3», менее 60% — «2».
+  По истечении времени тест сдаётся автоматически. Оценка: 90–100% — «5», 85–89% — «4», 75–84% — «3», менее 75% — «2».
 </div>
 
 <div class="name-block" id="nameBlock">
@@ -214,7 +214,7 @@ function submit(isAuto) {
   if (timerInterval) clearInterval(timerInterval);
   document.getElementById('timerBox').style.display = 'none';
 
-    let score = 0;
+  let score = 0;
   const details = [];
   Q.forEach((q, i) => {
     const qDiv = document.getElementById(`q${i}`);
@@ -241,12 +241,12 @@ function submit(isAuto) {
     });
   });
   submitted = true;
- 
+
   // Если ошибочных нет — добавим явную пометку
   if (details.length === 0) {
     details.push('✅ Все ответы верные — ошибок нет.');
   }
- 
+
   const total = Q.length;
   const pct = Math.round((score / total) * 100);
   let grade;
@@ -270,7 +270,7 @@ function submit(isAuto) {
 
   const res = document.getElementById('result');
   res.style.display = 'block';
-  res.className = 'result ' + (pct >= 60 ? 'pass' : 'fail');
+  res.className = 'result ' + (pct > 75 ? 'pass' : 'fail');
   res.innerHTML = `Результат: ${score} из ${total} (${pct}%) — оценка «${grade}»<small>${isAuto ? '⏰ Тест сдан автоматически. ' : ''}Результат отправлен руководителю.</small>`;
 
   document.getElementById('submitBtn').style.display = 'none';
