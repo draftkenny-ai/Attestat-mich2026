@@ -138,6 +138,7 @@
         <option value="Тест · Учёт рабочего времени (УРВ)">Учёт рабочего времени</option>
         <option value="Тест · Маркировка и хранение настоек">Маркировка настоек</option>
         <option value="Тест · Регламент по комплиментам">Регламент по комплиментам</option>
+        <option value="Тест · Регламент по неплательщикам">Регламент по неплательщикам</option>
         <option value="Итоговая аттестация">Итоговая аттестация</option>
       </select>
       <label>Оценка:</label>
@@ -355,6 +356,7 @@ function loadSettings() {
       'reg-urv-test.html': { name: 'Тест · Учёт рабочего времени', time: 10 },
       'reg-tincture-test.html': { name: 'Тест · Маркировка настоек', time: 10 },
       'reg-compliments-test.html': { name: 'Тест · Регламент по комплиментам', time: 10 },
+      'reg-nonpayers-test.html': { name: 'Тест · Регламент по неплательщикам', time: 10 },
       'final-attestation.html': { name: '🎓 Итоговая аттестация', time: 90 }
     };
     let html = '';
@@ -537,7 +539,8 @@ const TOPICS_LECTURES = [
   { id: 'lec_reg_bar', name: 'Рег (Бар)' }, 
   { id: 'lec_reg_urv', name: 'Рег (УРВ)' }, 
   { id: 'lec_reg_tincture', name: 'Рег (Наст)' },
-  { id: 'lec_reg_compliments', name: 'Рег (Компл)' }
+  { id: 'lec_reg_compliments', name: 'Рег (Компл)' },
+  { id: 'lec_reg_nonpayers', name: 'Рег (Неплат)' }
 ];
 
 const TOPICS_TESTS = [
@@ -553,7 +556,8 @@ const TOPICS_TESTS = [
   { id: 'reg-bar-test', name: 'Рег. Бар' },
   { id: 'reg-urv-test', name: 'Рег. УРВ' },
   { id: 'reg-tincture-test', name: 'Рег. Настойки' },
-  { id: 'reg-compliments-test', name: 'Рег. Комплименты' }
+  { id: 'reg-compliments-test', name: 'Рег. Комплименты' },
+  { id: 'reg-nonpayers-test', name: 'Рег. Неплательщ.' }
 ];
 
 const TOPICS_FINAL = [
