@@ -304,7 +304,6 @@ function calculateGrade(pct) {
 function formatDate(dateStr) {
   if (!dateStr) return '—';
   
-  // Если это ISO-строка (например, из Google Таблиц)
   if (dateStr.includes('T')) {
     const d = new Date(dateStr);
     if (!isNaN(d.getTime())) {
@@ -312,7 +311,6 @@ function formatDate(dateStr) {
     }
   }
   
-  // Если это уже локализованная строка (например, "05.11.2026, 14:30:00")
   const parts = dateStr.split(', ');
   if (parts.length === 2) {
     const timeParts = parts[1].split(':');
@@ -367,7 +365,6 @@ function renderTable() {
   const fName = document.getElementById('filterName').value.toLowerCase();
   
   let rows = allResults.filter(r => {
-    // Находим пользователя, чтобы узнать его бар
     const user = allUsers.find(u => u.name.trim().toLowerCase() === r.name.trim().toLowerCase());
     const userBar = user ? user.bar : '';
     
@@ -524,10 +521,11 @@ function renderUsersTable() {
         <button onclick="setUserStatus('${u.id}','deleted')" style="padding:6px 10px;background:#d9534f;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🗑 Удалить</button>
       `;
     } else if (u.status === 'approved') {
+      // ОБНОВЛЕННЫЙ БЛОК: только эмодзи, порядок Блок -> ФИО -> Пароль
       actions = `
-        <button onclick="editUserName('${u.id}','${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#f0ad4e;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">✏️ ФИО</button>
-        <button onclick="adminChangePassword('${u.id}', '${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">🔑 Пароль</button>
-        <button onclick="setUserStatus('${u.id}','blocked')" style="padding:6px 10px;background:#6c757d;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🚫 Блок</button>
+        <button onclick="setUserStatus('${u.id}','blocked')" style="padding:6px 10px;background:#6c757d;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">🚫</button>
+        <button onclick="editUserName('${u.id}','${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#f0ad4e;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;margin-right:4px">✏️</button>
+        <button onclick="adminChangePassword('${u.id}', '${u.name.replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">🔑</button>
       `;
     } else if (u.status === 'blocked') {
       actions = `
