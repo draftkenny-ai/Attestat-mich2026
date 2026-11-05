@@ -136,6 +136,8 @@
         <option value="Тест · Регламент работы в баре">Регламент работы в баре</option>
         <option value="Тест · Учёт рабочего времени (УРВ)">Учёт рабочего времени</option>
         <option value="Тест · Маркировка и хранение настоек">Маркировка настоек</option>
+        <option value="Тест · Регламент по комплиментам">Регламент по комплиментам</option>
+        <option value="Тест · Регламент по неплательщикам">Регламент по неплательщикам</option>
         <option value="Итоговая аттестация">Итоговая аттестация</option>
       </select>
       <label>Оценка:</label>
@@ -197,14 +199,14 @@
     <table>
       <thead>
         <tr>
-          <th>Бар</th><th>ФИО</th><th>Дата рожд.</th><th>Телефон</th><th>Статус</th>
+          <th>Бар</th><th>ФИО</th><th>Дата рожд.</th><th>Телефон</th><th>Telegram</th><th>Статус</th>
           <th style="text-align:center;">📖 Лекции</th>
           <th style="text-align:center;">📝 Тесты</th>
           <th>Действия</th>
         </tr>
       </thead>
       <tbody id="usersBody">
-        <tr><td colspan="8" class="empty">Загрузка…</td></tr>
+        <tr><td colspan="9" class="empty">Загрузка…</td></tr>
       </tbody>
     </table>
   </div>
@@ -219,7 +221,6 @@ let allResults = [];
 let allUsers = [];
 let currentPwd = '';
 
-// Если пароль уже введён — открываем панель сразу
 if (sessionStorage.getItem('mich_mgr_auth')) {
   currentPwd = sessionStorage.getItem('mich_mgr_auth');
   showPanel();
@@ -337,6 +338,8 @@ function loadSettings() {
       'reg-bar-test.html': { name: 'Тест · Регламент работы в баре', time: 10 },
       'reg-urv-test.html': { name: 'Тест · Учёт рабочего времени', time: 10 },
       'reg-tincture-test.html': { name: 'Тест · Маркировка настоек', time: 10 },
+      'reg-compliments-test.html': { name: 'Тест · Регламент по комплиментам', time: 10 },
+      'reg-nonpayers-test.html': { name: 'Тест · Регламент по неплательщикам', time: 10 },
       'final-attestation.html': { name: '🎓 Итоговая аттестация', time: 90 }
     };
     let html = '';
@@ -378,10 +381,10 @@ function formatBirthdate(dateStr) {
 }
 
 function loadUsers() {
-  document.getElementById('usersBody').innerHTML = '<tr><td colspan="8" class="empty">Загрузка…</td></tr>';
+  document.getElementById('usersBody').innerHTML = '<tr><td colspan="9" class="empty">Загрузка…</td></tr>';
   jsonp(WEB_APP_URL + '?action=getUsers&pwd=' + encodeURIComponent(currentPwd), (data) => {
     if (!data || data.error) {
-      document.getElementById('usersBody').innerHTML = '<tr><td colspan="8" class="empty">Ошибка загрузки</td></tr>';
+      document.getElementById('usersBody').innerHTML = '<tr><td colspan="9" class="empty">Ошибка загрузки</td></tr>';
       return;
     }
     allUsers = data.users || [];
@@ -405,7 +408,7 @@ function renderUsersTable() {
   });
 
   if (!rows.length) {
-    document.getElementById('usersBody').innerHTML = '<tr><td colspan="8" class="empty">Нет пользователей</td></tr>';
+    document.getElementById('usersBody').innerHTML = '<tr><td colspan="9" class="empty">Нет пользователей</td></tr>';
     return;
   }
 
@@ -418,12 +421,13 @@ function renderUsersTable() {
   document.getElementById('usersBody').innerHTML = rows.map(u => {
     const date = u.registered ? new Date(u.registered).toLocaleDateString('ru-RU') : '—';
     
+    // ВАЖНО: убрали fallback на {all: true}, чтобы пустая строка не давала доступ ко всему
     let accessObj = {};
-    try { accessObj = u.access ? JSON.parse(u.access) : {}; } catch(e) {}
+    try { accessObj = u.access ? JSON.parse(u.access) : {}; } catch(e) { accessObj = {}; }
     
-    // Проверяем галочки
+    // Проверяем галочки (если есть глобальный флаг ИЛИ старые индивидуальные разрешения)
     const hasLectures = accessObj.lec_all || Object.keys(accessObj).some(k => k.startsWith('lec_'));
-    const hasTests = accessObj.test_all || Object.keys(accessObj).some(k => !k.startsWith('lec_'));
+    const hasTests = accessObj.test_all || Object.keys(accessObj).some(k => !k.startsWith('lec_') && k !== 'all');
 
     let actions = '';
     if (u.status === 'pending') {
@@ -445,7 +449,6 @@ function renderUsersTable() {
       `;
     }
 
-    // Чекбоксы для лекций и тестов (работают только если статус approved)
     const disabledAttr = u.status !== 'approved' ? 'disabled' : '';
     const checkboxLec = `<input type="checkbox" ${hasLectures ? 'checked' : ''} ${disabledAttr} onchange="toggleAccess('${u.id}', 'lec_all', this.checked)" style="width:18px;height:18px;cursor:pointer">`;
     const checkboxTest = `<input type="checkbox" ${hasTests ? 'checked' : ''} ${disabledAttr} onchange="toggleAccess('${u.id}', 'test_all', this.checked)" style="width:18px;height:18px;cursor:pointer">`;
@@ -456,6 +459,7 @@ function renderUsersTable() {
         <td><b>${u.name}</b></td>
         <td>${formatBirthdate(u.birthdate)}</td>
         <td>${u.phone || '—'}</td>
+        <td>${u.telegram || '—'}</td>
         <td>${statusLabel[u.status] || u.status}</td>
         <td style="text-align:center;">${checkboxLec}</td>
         <td style="text-align:center;">${checkboxTest}</td>
@@ -469,24 +473,38 @@ function toggleAccess(userId, type, checked) {
   const u = allUsers.find(x => x.id === userId);
   if (!u) return;
 
+  // Читаем текущие права (пустая строка теперь корректно превращается в {})
   let accessObj = {};
   try { accessObj = u.access ? JSON.parse(u.access) : {}; } catch(e) {}
 
   if (type === 'lec_all') {
-    if (checked) accessObj.lec_all = true;
-    else delete accessObj.lec_all;
+    if (checked) {
+      accessObj.lec_all = true;
+    } else {
+      delete accessObj.lec_all;
+      // ПОЛНОСТЬЮ УДАЛЯЕМ ВСЕ СТАРЫЕ ИНДИВИДУАЛЬНЫЕ ДОСТУПЫ К ЛЕКЦИЯМ
+      Object.keys(accessObj).forEach(k => {
+        if (k.startsWith('lec_')) delete accessObj[k];
+      });
+    }
   } else if (type === 'test_all') {
-    if (checked) accessObj.test_all = true;
-    else delete accessObj.test_all;
+    if (checked) {
+      accessObj.test_all = true;
+    } else {
+      delete accessObj.test_all;
+      // ПОЛНОСТЬЮ УДАЛЯЕМ ВСЕ СТАРЫЕ ИНДИВИДУАЛЬНЫЕ ДОСТУПЫ К ТЕСТАМ
+      Object.keys(accessObj).forEach(k => {
+        if (!k.startsWith('lec_') && k !== 'all') delete accessObj[k];
+      });
+    }
   }
 
-  // Если после изменений объект пуст, можно оставить {} или удалить
   const jsonStr = JSON.stringify(accessObj);
   const url = WEB_APP_URL + '?action=saveUserAccess&pwd=' + encodeURIComponent(currentPwd) + '&userId=' + encodeURIComponent(userId) + '&access=' + encodeURIComponent(jsonStr);
   
   jsonp(url, (data) => {
     if (data && data.success) {
-      u.access = jsonStr; // Обновляем локально
+      u.access = jsonStr; // Обновляем локально, чтобы при перерисовке галочка не слетала
       showToast('✅ Доступы обновлены');
     } else {
       showToast('❌ Ошибка обновления');
