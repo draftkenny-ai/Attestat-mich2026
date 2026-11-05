@@ -48,7 +48,7 @@
 
 <div class="note">
   <b>Инструкция:</b> укажите ФИО и нажмите «Начать тест». Отметьте один ответ в каждом вопросе и нажмите «Сдать тест».
-  Когда время истечёт — тест сдастся автоматически. Оценка: 90–100% — «5», 75–89% — «4», 60–74% — «3», менее 60% — «2».
+  Когда время истечёт — тест сдастся автоматически. Оценка: 90–100% — «5», 85–89% — «4», 75–84% — «3», менее 75% — «2».
 </div>
 
 <div class="name-block" id="nameBlock">
@@ -68,6 +68,9 @@ const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZ
 const TEST_NAME = 'Тест №2';
 const TEST_FILE = 'test2.html';
 
+// ВАЖНО: варианты ответов расставлены так, что a:0 = правильный.
+// Ниже, в shuffleAllOptions(), они перемешиваются детерминированно,
+// чтобы правильный ответ не всегда стоял первым.
 const Q = [
 {v:2,q:"Какой аперитив входит в коктейль «Апероль спритц»?",o:["Апероль","Кампари","Чинзано","Мартини","Селано"],a:0},
 {v:2,q:"Какой крепкий алкоголь входит в коктейль «Ахтерштевень»?",o:["Абсент","Текила","Джин","Ром","Виски"],a:0},
@@ -120,6 +123,35 @@ const Q = [
 {v:2,q:"Какой сироп входит в коктейль «Царица»?",o:["Сироп яблоко","Сироп маракуйя","Сироп клубника","Сироп миндаль","Сироп кокос"],a:0},
 {v:2,q:"Какой ликер входит в коктейль «Эпл Сиритц»?",o:["Ликер яблоко","Ликер кофе","Ликер мараскино","Ликер фиалка","Ликер трипл сек"],a:0}
 ];
+
+/* ============================================================
+   Перемешивание вариантов ответов.
+   Детерминированное: у всех сотрудников и при каждой перезагрузке
+   один и тот же порядок. Правильные ответы равномерно распределяются
+   по всем позициям — больше не «всегда первый».
+   ============================================================ */
+function seededShuffle(arr, seed) {
+  const a = arr.slice();
+  let s = seed;
+  for (let i = a.length - 1; i > 0; i--) {
+    s = (s * 9301 + 49297) % 233280;
+    const j = Math.floor((s / 233280) * (i + 1));
+    const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+function shuffleAllOptions() {
+  Q.forEach((q, idx) => {
+    const indices = q.o.map((_, j) => j);
+    const shuffled = seededShuffle(indices, (idx + 1) * 73 + 17);
+    const newO = shuffled.map(j => q.o[j]);
+    const newA = shuffled.indexOf(q.a);
+    q.o = newO;
+    q.a = newA;
+  });
+}
+shuffleAllOptions();
 
 let submitted = false, testStarted = false, secondsLeft = 0, timerInterval = null, TEST_TIME_MIN = 15, userName = '';
 
@@ -224,7 +256,16 @@ function submit(isAuto) {
     const userAns = selected ? +selected.value : -1;
     const isCorrect = userAns === q.a;
     if (isCorrect) score++;
-    details.push(`${i + 1}. ${q.q}\nОтвет: ${userAns >= 0 ? q.o[userAns] : '—'}\nПравильный: ${q.o[q.a]}\n${isCorrect ? '✅ Верно' : '❌ Ошибка'}`);
+
+    // В details попадают ТОЛЬКО ошибки
+    if (!isCorrect) {
+      details.push(
+        `№${i + 1}. ${q.q}\n` +
+        `Ответ: ${userAns >= 0 ? q.o[userAns] : '— (нет ответа)'}\n` +
+        `Правильный: ${q.o[q.a]}`
+      );
+    }
+
     q.o.forEach((opt, j) => {
       const optLabel = document.getElementById(`q${i}o${j}`);
       optLabel.querySelector('input').disabled = true;
@@ -234,6 +275,11 @@ function submit(isAuto) {
     });
   });
   submitted = true;
+
+  // Если ошибочных нет — добавим явную пометку
+  if (details.length === 0) {
+    details.push('✅ Все ответы верные — ошибок нет.');
+  }
 
   const total = Q.length;
   const pct = Math.round((score / total) * 100);
@@ -258,7 +304,7 @@ function submit(isAuto) {
 
   const res = document.getElementById('result');
   res.style.display = 'block';
-  res.className = 'result ' + (pct >= 60 ? 'pass' : 'fail');
+  res.className = 'result ' + (pct > 75 ? 'pass' : 'fail');
   res.innerHTML = `Результат: ${score} из ${total} (${pct}%) — оценка «${grade}»<small>${isAuto ? '⏰ Тест сдан автоматически. ' : ''}Результат отправлен руководителю.</small>`;
 
   document.getElementById('submitBtn').style.display = 'none';
