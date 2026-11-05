@@ -11,7 +11,6 @@
   h1{font-size:24px;margin-bottom:6px}
   .sub{color:#666;font-size:13.5px;margin-bottom:24px}
   
-  /* Кнопка "Назад" */
   .back-btn {
     position: fixed;
     top: 20px;
@@ -36,7 +35,6 @@
     color: #4a90d9;
   }
 
-  /* Экран блокировки */
   .lock-screen{background:#fff;padding:40px 32px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.08);max-width:400px;margin:60px auto;text-align:center}
   .lock-screen h2{font-size:20px;margin-bottom:8px}
   .lock-screen p{color:#666;font-size:13.5px;margin-bottom:22px}
@@ -46,7 +44,6 @@
   .lock-screen button:hover{background:#357abd}
   .lock-error{color:#d9534f;font-size:13px;margin-top:10px;height:16px}
 
-  /* Панель */
   .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
   .tab{padding:10px 20px;background:#fff;border:2px solid #d0d7de;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;color:#333;transition:.15s}
   .tab:hover{border-color:#4a90d9}
@@ -69,7 +66,6 @@
   tr:last-child td{border-bottom:none}
   tr:hover td{background:#f8fafc}
   
-  /* Новая система оценок */
   .grade{display:inline-block;min-width:32px;text-align:center;padding:4px 10px;border-radius:8px;font-weight:700;font-size:13px}
   .grade-5{background:#28a745;color:#fff}
   .grade-4{background:#ffc107;color:#333}
@@ -100,10 +96,8 @@
 </head>
 <body>
 
-<!-- КНОПКА НАЗАД -->
 <a href="index.html" class="back-btn">← На главную</a>
 
-<!-- ЭКРАН ПАРОЛЯ -->
 <div id="lockScreen" class="lock-screen">
   <h2>🔐 Панель руководителя</h2>
   <p>Введите пароль руководителя для доступа</p>
@@ -112,7 +106,6 @@
   <div class="lock-error" id="lockError"></div>
 </div>
 
-<!-- ПАНЕЛЬ -->
 <div id="panel" class="container" style="display:none">
   <h1>Панель руководителя</h1>
   <div class="sub">Школа Барменов МиЧ · Gask Bro Group</div>
@@ -123,7 +116,6 @@
     <button class="tab" onclick="showTab('users', this)">👥 Пользователи и доступы</button>
   </div>
 
-  <!-- ВКЛАДКА: РЕЗУЛЬТАТЫ -->
   <div id="tab-results" class="panel active">
     <div class="stats" id="stats"></div>
     <div class="filters">
@@ -179,7 +171,6 @@
     </table>
   </div>
 
-  <!-- ВКЛАДКА: НАСТРОЙКИ -->
   <div id="tab-settings" class="panel">
     <div class="settings-card">
       <h3>⏱ Время на прохождение тестов</h3>
@@ -188,7 +179,6 @@
     </div>
   </div>
 
-  <!-- ВКЛАДКА: ПОЛЬЗОВАТЕЛИ И ДОСТУПЫ -->
   <div id="tab-users" class="panel">
     <div class="filters">
       <label>Статус:</label>
@@ -239,7 +229,6 @@ let allResults = [];
 let allUsers = [];
 let currentPwd = '';
 
-// Если пароль уже введён — открываем панель сразу
 if (sessionStorage.getItem('mich_mgr_auth')) {
   currentPwd = sessionStorage.getItem('mich_mgr_auth');
   showPanel();
@@ -299,24 +288,25 @@ function calculateGrade(pct) {
 }
 
 function formatDate(dateStr) {
-  if (!dateStr) return '—';
-  
-  if (dateStr.includes('T')) {
-    const d = new Date(dateStr);
+  if (dateStr === undefined || dateStr === null || dateStr === '') return '—';
+  const s = String(dateStr);
+
+  if (s.includes('T')) {
+    const d = new Date(s);
     if (!isNaN(d.getTime())) {
       return d.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
   }
-  
-  const parts = dateStr.split(', ');
+
+  const parts = s.split(', ');
   if (parts.length === 2) {
     const timeParts = parts[1].split(':');
     if (timeParts.length >= 2) {
       return `${parts[0]} ${timeParts[0]}:${timeParts[1]}`;
     }
   }
-  
-  return dateStr;
+
+  return s;
 }
 
 function loadResults() {
@@ -334,11 +324,11 @@ function loadResults() {
 
 function renderStats() {
   const total = allResults.length;
-  
+
   let totalPct = 0;
   allResults.forEach(r => { totalPct += parsePercent(r.pct); });
   const avg = total ? Math.round(totalPct / total) : '—';
-  
+
   let grade5 = 0, grade2 = 0;
   allResults.forEach(r => {
     const pct = parsePercent(r.pct);
@@ -346,7 +336,7 @@ function renderStats() {
     if (g === 5) grade5++;
     if (g === 2) grade2++;
   });
-  
+
   document.getElementById('stats').innerHTML = `
     <div class="stat"><div class="stat-label">Всего прохождений</div><div class="stat-value">${total}</div></div>
     <div class="stat"><div class="stat-label">Средний результат</div><div class="stat-value">${avg}%</div></div>
@@ -360,35 +350,37 @@ function renderTable() {
   const fTest = document.getElementById('filterTest').value;
   const fGrade = document.getElementById('filterGrade').value;
   const fName = document.getElementById('filterName').value.toLowerCase();
-  
+
   let rows = allResults.filter(r => {
-    const user = allUsers.find(u => u.name.trim().toLowerCase() === r.name.trim().toLowerCase());
+    const userName = String(r.name || '').trim().toLowerCase();
+    const user = allUsers.find(u => String(u.name || '').trim().toLowerCase() === userName);
     const userBar = user ? user.bar : '';
-    
+
     if (fBar && userBar !== fBar) return false;
     if (fTest && r.test !== fTest) return false;
-    
+
     const pct = parsePercent(r.pct);
     const g = calculateGrade(pct);
     if (fGrade && String(g) !== fGrade) return false;
-    
-    if (fName && !String(r.name).toLowerCase().includes(fName)) return false;
-    
+
+    if (fName && !String(r.name || '').toLowerCase().includes(fName)) return false;
+
     return true;
   });
-  
+
   if (!rows.length) {
     document.getElementById('resultsBody').innerHTML = '<tr><td colspan="7" class="empty">Нет данных</td></tr>';
     return;
   }
-  
+
   document.getElementById('resultsBody').innerHTML = rows.map(r => {
     const pct = parsePercent(r.pct);
     const g = calculateGrade(pct);
-    
-    const user = allUsers.find(u => u.name.trim().toLowerCase() === r.name.trim().toLowerCase());
+
+    const userName = String(r.name || '').trim().toLowerCase();
+    const user = allUsers.find(u => String(u.name || '').trim().toLowerCase() === userName);
     const userBar = user ? user.bar : '—';
-    
+
     return `
       <tr>
         <td style="white-space:nowrap">${formatDate(r.date)}</td>
@@ -484,7 +476,7 @@ function renderUsersTable() {
     if (fStatus && u.status !== fStatus) return false;
     if (fBar && u.bar !== fBar) return false;
     if (fName) {
-      const hay = ((u.name || '') + ' ' + (u.phone || '')).toLowerCase();
+      const hay = (String(u.name || '') + ' ' + String(u.phone || '')).toLowerCase();
       if (!hay.includes(fName)) return false;
     }
     return true;
@@ -501,44 +493,61 @@ function renderUsersTable() {
     blocked:  '<span style="color:#c0392b;font-weight:700">🚫 Заблокирован</span>'
   };
 
+  // Безопасное экранирование для inline-onclick
+  function jsAttr(val) {
+    return String(val == null ? '' : val)
+      .replace(/\\/g, '\\\\')
+      .replace(/'/g, "\\'")
+      .replace(/"/g, '&quot;');
+  }
+
   document.getElementById('usersBody').innerHTML = rows.map(u => {
     let accessObj = {};
-    try { accessObj = u.access ? JSON.parse(u.access) : {}; } catch(e) { accessObj = {}; }
-    
-    const hasLectures = accessObj.lec_all || Object.keys(accessObj).some(k => k.startsWith('lec_'));
-    const hasTests = accessObj.test_all || Object.keys(accessObj).some(k => !k.startsWith('lec_') && k !== 'final-attestation');
-    const hasFinal = accessObj.final_all || accessObj['final-attestation'] === true;
+    try {
+      accessObj = u.access ? JSON.parse(u.access) : {};
+      if (!accessObj || typeof accessObj !== 'object') accessObj = {};
+    } catch (e) {
+      accessObj = {};
+    }
+
+    const hasLectures = !!accessObj.lec_all || Object.keys(accessObj).some(k => k.startsWith('lec_'));
+    const hasTests    = !!accessObj.test_all || Object.keys(accessObj).some(k => !k.startsWith('lec_') && k !== 'final-attestation');
+    const hasFinal    = !!accessObj.final_all || accessObj['final-attestation'] === true;
+
+    const safeId    = jsAttr(u.id);
+    const safeName  = jsAttr(u.name);
+    const safePhone = jsAttr(u.phone);
 
     let actions = '';
     if (u.status === 'pending') {
       actions = `
         <div style="display:flex; gap:4px; white-space:nowrap;">
-          <button onclick="setUserStatus('${u.id}','approved')" style="padding:6px 10px;background:#28a745;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Одобрить">✅</button>
-          <button onclick="setUserStatus('${u.id}','deleted')" style="padding:6px 10px;background:#d9534f;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Удалить">🗑</button>
+          <button onclick="setUserStatus('${safeId}','approved')" style="padding:6px 10px;background:#28a745;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Одобрить">✅</button>
+          <button onclick="setUserStatus('${safeId}','deleted')" style="padding:6px 10px;background:#d9534f;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Удалить">🗑</button>
         </div>
       `;
     } else if (u.status === 'approved') {
       actions = `
         <div style="display:flex; gap:4px; white-space:nowrap;">
-          <button onclick="setUserStatus('${u.id}','blocked')" style="padding:6px 10px;background:#6c757d;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Заблокировать">🚫</button>
-          <button onclick="editUserContacts('${u.id}','${(u.name || '').replace(/'/g, "\\'")}','${(u.phone || '').replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#f0ad4e;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Изменить ФИО и телефон">✏️</button>
-          <button onclick="adminChangePassword('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Сменить пароль">🔑</button>
+          <button onclick="setUserStatus('${safeId}','blocked')" style="padding:6px 10px;background:#6c757d;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Заблокировать">🚫</button>
+          <button onclick="editUserContacts('${safeId}','${safeName}','${safePhone}')" style="padding:6px 10px;background:#f0ad4e;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Изменить ФИО и телефон">✏️</button>
+          <button onclick="adminChangePassword('${safeId}', '${safeName}')" style="padding:6px 10px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Сменить пароль">🔑</button>
         </div>
       `;
     } else if (u.status === 'blocked') {
       actions = `
         <div style="display:flex; gap:4px; white-space:nowrap;">
-          <button onclick="setUserStatus('${u.id}','approved')" style="padding:6px 10px;background:#28a745;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Разблокировать">✅</button>
-          <button onclick="adminChangePassword('${u.id}', '${(u.name || '').replace(/'/g, "\\'")}')" style="padding:6px 10px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Сменить пароль">🔑</button>
-          <button onclick="setUserStatus('${u.id}','deleted')" style="padding:6px 10px;background:#d9534f;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Удалить">🗑</button>
+          <button onclick="setUserStatus('${safeId}','approved')" style="padding:6px 10px;background:#28a745;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Разблокировать">✅</button>
+          <button onclick="adminChangePassword('${safeId}', '${safeName}')" style="padding:6px 10px;background:#4a90d9;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Сменить пароль">🔑</button>
+          <button onclick="setUserStatus('${safeId}','deleted')" style="padding:6px 10px;background:#d9534f;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer" title="Удалить">🗑</button>
         </div>
       `;
     }
 
     const disabledAttr = u.status !== 'approved' ? 'disabled' : '';
-    const checkboxLec = `<input type="checkbox" ${hasLectures ? 'checked' : ''} ${disabledAttr} onchange="toggleAccess('${u.id}', 'lec_all', this.checked)" style="width:18px;height:18px;cursor:pointer">`;
-    const checkboxTest = `<input type="checkbox" ${hasTests ? 'checked' : ''} ${disabledAttr} onchange="toggleAccess('${u.id}', 'test_all', this.checked)" style="width:18px;height:18px;cursor:pointer">`;
-    const checkboxFinal = `<input type="checkbox" ${hasFinal ? 'checked' : ''} ${disabledAttr} onchange="toggleAccess('${u.id}', 'final_all', this.checked)" style="width:18px;height:18px;cursor:pointer">`;
+    const checkboxLec   = `<input type="checkbox" ${hasLectures ? 'checked' : ''} ${disabledAttr} onchange="toggleAccess('${safeId}', 'lec_all', this.checked)" style="width:18px;height:18px;cursor:pointer">`;
+    const checkboxTest  = `<input type="checkbox" ${hasTests ? 'checked' : ''} ${disabledAttr} onchange="toggleAccess('${safeId}', 'test_all', this.checked)" style="width:18px;height:18px;cursor:pointer">`;
+    const checkboxFinal = `<input type="checkbox" ${hasFinal ? 'checked' : ''} ${disabledAttr} onchange="toggleAccess('${safeId}', 'final_all', this.checked)" style="width:18px;height:18px;cursor:pointer">`;
 
     return `
       <tr>
@@ -558,11 +567,11 @@ function renderUsersTable() {
 }
 
 function toggleAccess(userId, type, checked) {
-  const u = allUsers.find(x => x.id === userId);
+  const u = allUsers.find(x => String(x.id) === String(userId));
   if (!u) return;
 
   let accessObj = {};
-  try { accessObj = u.access ? JSON.parse(u.access) : {}; } catch(e) {}
+  try { accessObj = u.access ? JSON.parse(u.access) : {}; if (!accessObj || typeof accessObj !== 'object') accessObj = {}; } catch(e) { accessObj = {}; }
 
   if (type === 'lec_all') {
     if (checked) {
@@ -593,7 +602,7 @@ function toggleAccess(userId, type, checked) {
 
   const jsonStr = JSON.stringify(accessObj);
   const url = WEB_APP_URL + '?action=saveUserAccess&pwd=' + encodeURIComponent(currentPwd) + '&userId=' + encodeURIComponent(userId) + '&access=' + encodeURIComponent(jsonStr);
-  
+
   jsonp(url, (data) => {
     if (data && data.success) {
       u.access = jsonStr;
@@ -620,8 +629,10 @@ function setUserStatus(userId, status) {
 
 /* -------- Редактирование ФИО + ТЕЛЕФОН одной кнопкой -------- */
 function editUserContacts(userId, currentName, currentPhone) {
-  // Шаг 1 — ФИО
-  const newName = prompt('ФИО сотрудника:', currentName || '');
+  const safeCurrentName  = String(currentName  || '');
+  const safeCurrentPhone = String(currentPhone || '');
+
+  const newName = prompt('ФИО сотрудника:', safeCurrentName);
   if (newName === null) return;
   const trimmedName = newName.trim();
   if (trimmedName.length < 3) {
@@ -629,14 +640,12 @@ function editUserContacts(userId, currentName, currentPhone) {
     return;
   }
 
-  // Шаг 2 — Телефон
-  const newPhone = prompt('Номер телефона:', currentPhone || '');
+  const newPhone = prompt('Номер телефона:', safeCurrentPhone);
   if (newPhone === null) return;
   const trimmedPhone = newPhone.trim();
 
-  // Если ничего не поменяли — выходим
-  if (trimmedName === (currentName || '').trim() &&
-      trimmedPhone === (currentPhone || '').trim()) {
+  if (trimmedName === safeCurrentName.trim() &&
+      trimmedPhone === safeCurrentPhone.trim()) {
     showToast('Изменений нет');
     return;
   }
@@ -660,8 +669,9 @@ function editUserContacts(userId, currentName, currentPhone) {
 
 /* Старая функция — оставлена на случай, если где-то ещё вызывается */
 function editUserName(userId, currentName) {
-  const newName = prompt('Новое ФИО:', currentName);
-  if (!newName || newName.trim() === currentName.trim() || newName.trim().length < 3) return;
+  const safeCurrentName = String(currentName || '');
+  const newName = prompt('Новое ФИО:', safeCurrentName);
+  if (!newName || newName.trim() === safeCurrentName.trim() || newName.trim().length < 3) return;
   const url = WEB_APP_URL + '?action=editUserName&pwd=' + encodeURIComponent(currentPwd) + '&userId=' + encodeURIComponent(userId) + '&name=' + encodeURIComponent(newName.trim());
   jsonp(url, (data) => {
     if (data && data.success) { showToast('✅ ФИО обновлено'); loadUsers(); }
@@ -671,7 +681,7 @@ function editUserName(userId, currentName) {
 
 function adminChangePassword(userId, userName) {
   const newPass = prompt(`Введите новый пароль для сотрудника: ${userName}\n\n(Минимум 6 символов)`);
-  if (newPass === null) return; 
+  if (newPass === null) return;
   if (newPass.trim().length < 6) {
     alert('Ошибка: пароль должен быть не менее 6 символов!');
     return;
