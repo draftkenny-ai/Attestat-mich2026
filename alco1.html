@@ -214,7 +214,7 @@ function submit(isAuto) {
   if (timerInterval) clearInterval(timerInterval);
   document.getElementById('timerBox').style.display = 'none';
 
-  let score = 0;
+    let score = 0;
   const details = [];
   Q.forEach((q, i) => {
     const qDiv = document.getElementById(`q${i}`);
@@ -222,7 +222,16 @@ function submit(isAuto) {
     const userAns = selected ? +selected.value : -1;
     const isCorrect = userAns === q.a;
     if (isCorrect) score++;
-    details.push(`${i + 1}. ${q.q}\nОтвет: ${userAns >= 0 ? q.o[userAns] : '—'}\nПравильный: ${q.o[q.a]}\n${isCorrect ? '✅ Верно' : '❌ Ошибка'}`);
+
+    // В details попадают ТОЛЬКО ошибки
+    if (!isCorrect) {
+      details.push(
+        `№${i + 1}. ${q.q}\n` +
+        `Ответ: ${userAns >= 0 ? q.o[userAns] : '— (нет ответа)'}\n` +
+        `Правильный: ${q.o[q.a]}`
+      );
+    }
+
     q.o.forEach((opt, j) => {
       const optLabel = document.getElementById(`q${i}o${j}`);
       optLabel.querySelector('input').disabled = true;
