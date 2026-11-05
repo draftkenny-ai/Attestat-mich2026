@@ -9,14 +9,11 @@
 
   if (isRegisterPage || isAdminPage) return;
 
-  // Защита от кнопки "Назад" (чтобы не открывалась страница из кэша)
   window.addEventListener('pageshow', (event) => {
     if (event.persisted) location.reload();
   });
 
   const isIframe = window.top !== window.self;
-
-  // СКРЫВАЕМ КОНТЕНТ ВСЕГДА (даже в iframe), пока не проверим доступ
   document.documentElement.style.display = 'none';
 
   function goToLogin() {
@@ -48,7 +45,6 @@
     delete window[cbName];
     
     if (data && data.valid) {
-      // Принудительно обновляем права из базы (даже если это пустой объект)
       if (data.access !== undefined) {
         user.access = data.access;
         localStorage.setItem(KEY, JSON.stringify(user));
@@ -69,25 +65,24 @@
   function setupPage(user) {
     window.MICH_USER = user;
 
-    // ДОБАВЛЕНЫ ВСЕ ТЕСТЫ, ВКЛЮЧАЯ НЕПЛАТЕЛЬЩИКОВ
-    const testPages = [
-      'test1.html', 'test2.html', 'test3.html', 
-      'service.html', 
-      'alco1.html', 'alco2.html', 'alco3.html', 
-      'beer1.html', 'tincture1.html', 
-      'reg-bar-test.html', 'reg-urv-test.html', 'reg-tincture-test.html', 
-      'reg-compliments-test.html', 
-      'reg-nonpayers-test.html',
-      'final-attestation.html'
-    ];
+    // Вспомогательная функция проверки доступа к конкретной карточке
+    function checkAccess(topicId) {
+      if (!user.access) return false;
+      if (user.access.all) return true; // Если админ дал доступ ко всему (старая логика)
+      
+      // Проверка на глобальные галочки из новой админки
+      if (topicId.startsWith('lec_') && user.access.lec_all) return true;
+      if (!topicId.startsWith('lec_') && user.access.test_all) return true;
+
+      return user.access[topicId] === true;
+    }
+
+    const testPages = ['test1.html','test2.html','test3.html','service.html','alco1.html','alco2.html','alco3.html','beer1.html','tincture1.html','reg-bar-test.html','reg-urv-test.html','reg-tincture-test.html','final-attestation.html'];
     
+    // Защита прямых ссылок на тесты
     if (testPages.includes(page)) {
       const topicId = page.replace('.html', '');
-      let hasAccess = false;
-      if (user.access && user.access.all === true) hasAccess = true;
-      else if (user.access && user.access[topicId] === true) hasAccess = true;
-
-      if (!hasAccess) {
+      if (!checkAccess(topicId)) {
         alert('⛔ У вас нет доступа к этому тесту.');
         if (isIframe) window.top.location.href = 'index.html';
         else location.replace('index.html');
@@ -106,6 +101,7 @@
         if (hint) hint.textContent = `Вы вошли как ${user.name} · ${user.bar || ''}`;
       }
 
+      // Блокировка карточек на главной
       if (!isIframe && (page === 'index.html' || page === '')) {
         const allCards = document.querySelectorAll('a.card');
         allCards.forEach(card => {
@@ -117,11 +113,7 @@
           }
 
           if (topicId) {
-            let hasAccess = false;
-            if (user.access && user.access.all === true) hasAccess = true;
-            else if (user.access && user.access[topicId] === true) hasAccess = true;
-
-            if (!hasAccess) {
+            if (!checkAccess(topicId)) {
               card.style.opacity = '0.5';
               card.style.pointerEvents = 'none';
               card.style.filter = 'grayscale(1)';
