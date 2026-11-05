@@ -69,7 +69,16 @@
   function setupPage(user) {
     window.MICH_USER = user;
 
-    const testPages = ['test1.html','test2.html','test3.html','service.html','alco1.html','alco2.html','alco3.html','beer1.html','tincture1.html','reg-bar-test.html','reg-urv-test.html','reg-tincture-test.html','final-attestation.html'];
+    // ДОБАВЛЕН ТЕСТ ПО КОМПЛИМЕНТАМ
+    const testPages = [
+      'test1.html', 'test2.html', 'test3.html', 
+      'service.html', 
+      'alco1.html', 'alco2.html', 'alco3.html', 
+      'beer1.html', 'tincture1.html', 
+      'reg-bar-test.html', 'reg-urv-test.html', 'reg-tincture-test.html', 
+      'reg-compliments-test.html', 
+      'final-attestation.html'
+    ];
     
     if (testPages.includes(page)) {
       const topicId = page.replace('.html', '');
