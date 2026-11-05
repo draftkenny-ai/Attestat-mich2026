@@ -63,7 +63,7 @@
 <div id="result" class="result" style="display:none"></div>
 
 <script>
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxFxRX6ohQrDWxSJezONoX9q_Id09GOpCan_x6UtLQoix1terh0pVmYKn4_ecroHV0Q/exec';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZTqxuRO5vVcZs5Q9MlPbtPK9gEnMlEWFpJpq3FtQsdi_cPR4y/exec';
 const TEST_NAME = 'Тест по алкоголю №2';
 const TEST_FILE = 'alco2.html';
 
@@ -235,9 +235,9 @@ function submit(isAuto) {
   const total = Q.length;
   const pct = Math.round((score / total) * 100);
   let grade;
-  if (pct >= 90) grade = 5;
-  else if (pct >= 75) grade = 4;
-  else if (pct >= 60) grade = 3;
+  if (pct > 90) grade = 5;
+  else if (pct > 85) grade = 4;
+  else if (pct > 75) grade = 3;
   else grade = 2;
 
   const payload = {
