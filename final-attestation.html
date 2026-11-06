@@ -24,6 +24,18 @@
   .option.locked{cursor:default}.option.locked:hover{background:transparent}
   .option.correct{background:#d4edda}.option.wrong{background:#f8d7da}
   .option.correct.locked:hover{background:#d4edda}.option.wrong.locked:hover{background:#f8d7da}
+  .ttk-hint{font-size:13px;color:#666;margin:0 0 12px;line-height:1.5}
+  .ttk-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+  .ttk-row .ttk-ing{flex:2 1 150px;min-width:0}
+  .ttk-row .ttk-amt{flex:1 1 100px;min-width:0;font-size:16px;text-align:center}
+  .ttk-input{padding:10px 12px;border:2px solid #d0d7de;border-radius:8px;font-size:15px;outline:none;transition:border .12s;width:100%}
+  .ttk-input:focus{border-color:#c0392b}
+  .ttk-input:disabled{background:#f0f2f5;color:#666;cursor:not-allowed}
+  .ttk-result{margin-top:10px;padding:12px 14px;border-radius:8px;font-size:13px;line-height:1.6}
+  .ttk-result.ok{background:#d4edda;color:#155724}
+  .ttk-result.bad{background:#f8d7da;color:#721c24}
+  .ttk-result ul{margin:6px 0 0 18px;padding:0}
+  .ttk-result li{margin-bottom:3px}
   .btn{display:block;margin:24px auto 8px;padding:15px 44px;font-size:17px;font-weight:700;background:#c0392b;color:#fff;border:none;border-radius:10px;cursor:pointer}
   .btn:hover{background:#9c2c20}.btn.secondary{background:#6c757d;font-size:14px;padding:10px 24px}.btn.secondary:hover{background:#565e64}
   .result{text-align:center;font-size:19px;font-weight:700;margin:16px 0 30px;padding:20px;border-radius:10px}
@@ -35,7 +47,7 @@
   #timerBox{position:fixed;top:14px;right:14px;background:#c0392b;color:#fff;padding:10px 18px;border-radius:12px;font-weight:700;font-size:17px;box-shadow:0 4px 14px rgba(0,0,0,.2);z-index:50;display:none;font-variant-numeric:tabular-nums}
   #timerBox.warn{background:#f0ad4e}#timerBox.danger{background:#d9534f;animation:pulse 1s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
-  @media (max-width:600px){body{padding:12px}.question{padding:12px 14px}#timerBox{top:8px;right:8px;padding:8px 14px;font-size:15px}}
+  @media (max-width:600px){body{padding:12px}.question{padding:12px 14px}#timerBox{top:8px;right:8px;padding:8px 14px;font-size:15px}.ttk-row{gap:6px}.ttk-row .ttk-ing{flex:2 1 120px}.ttk-row .ttk-amt{flex:1 1 80px}}
 </style>
 </head>
 <body>
@@ -49,7 +61,8 @@
 
 <div class="note">
   <b>Инструкция:</b> укажите ФИО и нажмите «Начать тест». Вопросы выбираются случайно из каждого блока — каждый раз новый набор.
-  По истечении времени тест сдаётся автоматически. Оценка: 90–100% — «5», 85–89% — «4», 75–84% — «3», менее 75% — «2».
+  В блоке 5 нужно ввести <b>все ингредиенты</b> каждого коктейля и их количество. По истечении времени тест сдаётся автоматически.
+  Оценка: 90–100% — «5», 85–89% — «4», 75–84% — «3», менее 75% — «2».
 </div>
 
 <div class="name-block" id="nameBlock">
@@ -64,23 +77,20 @@
 <div id="testBox"></div>
 <div id="result" class="result" style="display:none"></div>
 
+<datalist id="all-ingredients"></datalist>
+
 <script>
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzbjmYk6lzqYcDAnsJZTqxuRO5vVcZs5Q9MlPbtPK9gEnMlEWFpJpq3FtQsdi_cPR4y/exec';
 const TEST_NAME = 'Итоговая аттестация';
 const TEST_FILE = 'final-attestation.html';
 const QUESTIONS_PER_BLOCK = 10;
 
-/* ============================================================
-   БЛОКИ ВОПРОСОВ
-   Каждый блок — массив {q, o, a}. Если хотите расширить пул —
-   добавьте новые вопросы в нужный массив. Правильный ответ — a: индекс.
-   ============================================================ */
 const BLOCK_NAMES = {
   block1: 'Блок 1. Бармен',
   block2: 'Блок 2. Пиво и настойки',
   block3: 'Блок 3. Алкоголь',
   block4: 'Блок 4. Регламенты',
-  block5: 'Блок 5. Сервис'
+  block5: 'Блок 5. ТТК — ингредиенты'
 };
 
 const POOLS = {
@@ -141,7 +151,7 @@ const POOLS = {
     {q:"В каком году основана Glenfiddich?",o:["1815","1887","1824","1846"],a:1},
     {q:"На каком острове находится Laphroaig?",o:["Скай","Оркнейские","Айла","Гебридские"],a:2},
     {q:"Чем сушат ячмень для Laphroaig?",o:["Дымом от дуба","Торфом","Горячим воздухом","Ветром"],a:1},
-    {q:"На каком острове находится Talisker?",o:["Айла","Оркнейские","Скай","Гебридские"],a:2},
+    {q:"На каком острове находится Talisker?",o:["Айла","Оркнейские","Скай","Геб��идские"],a:2},
     {q:"Какая зерновая смесь у Woodford Reserve?",o:["51% кукурузы, 49% ржи","100% кукурузы","~72% кукурузы, 18% ржи, 10% ячменя","70% ржи, 30% ячменя"],a:2},
     {q:"Где производится Jack Daniel's?",o:["Луисвилл, Кентукки","Дублин, Ирландия","Линчберг, Теннесси","Спейсайд, Шотландия"],a:2},
     {q:"Что такое charcoal mellowing?",o:["Двойная перегонка","Фильтрация через уголь из сахарного клёна","Фильтрация через торф","Выдержка в бочке из клёна"],a:1},
@@ -181,33 +191,65 @@ const POOLS = {
     {q:"Кто имеет право закрывать чеки на неплательщиков?",o:["Любой бармен","Официант","Непосредственно менеджер, ответственный на смене","Сам гость"],a:2},
     {q:"Куда обязательно отправляется подписанный чек на неплательщика?",o:["В чат «Касса» с комментарием","В чат «Накладные»","В бухгалтерию","Никуда, достаточно подписи"],a:0},
     {q:"Что грозит менеджеру смены за отсутствие комментария к чеку неплательщика?",o:["Устное предупреждение","Штраф 500 рублей","Штраф 1 000 рублей","Увольнение"],a:2}
-  ],
-  block5: [
-    {q:"Что является причиной пищевого отравления?",o:["Несоблюдение личной гигиены","Быстрое обслуживание гостей","Громкая музыка в зале","Яркое освещение"],a:0},
-    {q:"Какой должна быть одежда сотрудника?",o:["Чистой, выглаженной, без дырок и пятен","Только чёрного цвета","Только брендовой","Дорогой и модной"],a:0},
-    {q:"Какая обувь допустима на работе?",o:["Любая, обязательно закрывающая пятки и пальцы, без каблука и платформы","Только кроссовки","Только туфли на каблуке","Только сандалии"],a:0},
-    {q:"Как должны быть убраны волосы?",o:["Собраны в пучок или косу","Распущены","В хвостик","Любой вариант допустим"],a:0},
-    {q:"Что возглавляет хит-парад бактериальных террористов?",o:["Ключи и дверные ручки","Обеденные столы","Барная стойка","Стены"],a:0},
-    {q:"Равны ли руки в перчатках и только что помытые руки?",o:["Да, абсолютно равны","Нет, руки в перчатках чище","Нет, руки в перчатках грязнее","Зависит от материала перчаток"],a:0},
-    {q:"Можно ли приходить на работу простуженным?",o:["Нет","Да, если легко","Да, если выпить чай","Да, если недолго"],a:0},
-    {q:"Что нужно делать с порезами на работе?",o:["Закрыть пластырем","Игнорировать","Забинтовать туго","Не работать вообще"],a:0},
-    {q:"Что является первым этапом цикла сервиса?",o:["Приветствие","Рассадка","Подача меню","Первый заказ"],a:0},
-    {q:"Как лучше рассаживать гостей?",o:["Взять инициативу в свои руки, показать конкретный столик","Дать выбор из 10 столов","Отправить искать самим","Не помогать"],a:0},
-    {q:"Что делать если свободных мест нет?",o:["Предложить альтернативу","Развести руками","Отказать","Молчать"],a:0},
-    {q:"Что важно предложить при первом заказе?",o:["Конкретную позицию — хит заведения, новинку","Самое дорогое","Всё меню сразу","Ничего"],a:0},
-    {q:"Что сначала — забивать заказ или делать?",o:["Сначала забиваем заказ, потом делаем","Сначала делаем","Одновременно","Неважно"],a:0},
-    {q:"Что подаётся первым делом при подаче заказа?",o:["Приборы","Напитки","Блюда","Десерт"],a:0},
-    {q:"Что обязательно делать при подаче?",o:["Называть то, что подаёте","Молчать","Спрашивать про планы","Шутить"],a:0},
-    {q:"Что такое запара?",o:["Состояние, когда не можешь справиться с количеством работы","Много гостей","Мало гостей","Плохое настроение"],a:0},
-    {q:"Что делать первым делом при запара?",o:["Выдохнуть и оценить ситуацию","Бежать","Кричать","Уйти"],a:0},
-    {q:"Что означает «правило полных рук»?",o:["В руках всегда должно быть что-нибудь","Всегда носить всё","Всегда с полными руками","Неважно"],a:0},
-    {q:"Чем отличается «предложение» от «продажи»?",o:["Предложение — узнать что нравится гостю и предложить подходящее","Ничем","Продажа лучше","Предложение хуже"],a:0},
-    {q:"Что такое «рефилл»?",o:["Повторение напитка","Замена блюда","Возврат денег","Скидка"],a:0},
-    {q:"Что означает слово «конфликт»?",o:["Столкновение","Дружба","Спор","Проблема"],a:0},
-    {q:"Что означает «В» в схеме ВОПРОС?",o:["Выслушать","Вопрос","Внимание","Встретить"],a:0},
-    {q:"Что означает «П» в схеме ВОПРОС?",o:["Принести извинения","Привет","Помочь","Понять"],a:0}
   ]
 };
+
+/* ============================================================
+   БЛОК 5 — коктейли из ТТК
+   ============================================================ */
+const TTK_BLOCK5 = [
+  {name:"Апероль спритц", ing:[["Ликер Апероль",60,"мл"],["Вода газированная",30,"мл"],["Игристое вино брют",120,"мл"],["Фрукты/цитрусы",15,"г"]]},
+  {name:"Ахтерштевень", ing:[["Сироп клубника",15,"мл"],["Абсент",20,"мл"],["Смесь кислот",20,"мл"],["Ликер трипл сек",20,"мл"],["Фрукты/цитрусы",25,"г"]]},
+  {name:"Б-52", ing:[["Ликер Бейлис",15,"мл"],["Ликер кофе",15,"мл"],["Ликер трипл сек",15,"мл"]]},
+  {name:"Белый русский", ing:[["Сливки 11%",30,"мл"],["Водка Хаус",30,"мл"],["Ликер кофе",30,"мл"]]},
+  {name:"Блади Мэри", ing:[["Сангрита пф МЧ",200,"мл"],["Водка Хаус",50,"мл"],["Фрукты/цитрусы",20,"г"]]},
+  {name:"Идеальный шторм (негрони)", ing:[["Кампари",30,"мл"],["Джин",30,"мл"],["Мартини россо",30,"мл"]]},
+  {name:"Малиновый физ", ing:[["Джин Хаус",40,"мл"],["Пюре малина",40,"г"],["Сироп маракуйя",20,"мл"],["Вода газированная",50,"мл"],["Смесь кислот",10,"мл"],["Фрукты/цитрусы",20,"г"]]},
+  {name:"Маракуйя спритц", ing:[["Сироп Маракуйя",20,"мл"],["Сидр Роял",100,"мл"],["Фрукты/цитрусы",20,"г"],["Инфьюзи Маракуйя-Ваниль",40,"мл"],["Вода газированная",30,"мл"]]},
+  {name:"Онли фанс мартини", ing:[["Пюре манго",30,"г"],["Смесь кислот",15,"мл"],["Фрукты/цитрусы",25,"г"],["Водка Хаус",40,"мл"],["Вино игристое Хаус",40,"мл"],["Сироп Пряный",10,"мл"]]},
+  {name:"Hemingway Special", ing:[["Смесь ромов пф МЧ",40,"мл"],["Сок грейпфрут",30,"мл"],["Сироп пряный пф МЧ",10,"мл"],["Ликер мараскино",15,"мл"],["Цедра апельсина",10,"г"],["Смесь кислот",20,"мл"]]},
+  {name:"Margarita", ing:[["Текила Хаус",50,"мл"],["Ликер трипл сек",20,"мл"],["Сироп лайм",20,"мл"],["Кислота",10,"мл"]]},
+  {name:"Авиация", ing:[["Джин Хаус",40,"мл"],["Ликер фиалка",10,"мл"],["Ликер Мараскино",15,"мл"],["Смесь кислот",15,"мл"],["Вишня коктейльная",5,"г"]]},
+  {name:"Аквамен", ing:[["Ром",40,"мл"],["Ликер персик",20,"мл"],["Сироп яблоко",15,"мл"],["Кислота",20,"мл"],["Сок ананас",75,"мл"]]},
+  {name:"Сарти Сприц", ing:[["Ликер Сарти",40,"мл"],["Вино игристое Хаус",80,"мл"],["Кордиал Манго Маракуйя Сливки",30,"мл"],["Вода газированная",30,"мл"],["Ароматизатор SlowMo Вишня",1,"мл"],["Фрукты/цитрусы",20,"г"]]},
+  {name:"Секс on The city", ing:[["Водка Шмидт Грейпфрут",30,"мл"],["Вермут Мартини драй",5,"мл"],["Пюре Маракуйя",20,"г"],["Кордиал Маракуйя Каламанси Ваниль",40,"мл"],["Яичный белок",10,"мл"],["Фрукты/цитрусы",20,"г"],["Вино игристое Хаус",40,"мл"],["Ароматизатор SlowMo Цедра апельсина",1,"мл"]]},
+  {name:"Шальной круиз", ing:[["Текила Хаус",40,"мл"],["Сироп гренадин",15,"мл"],["Сок апельсин",150,"мл"],["Цитрусы",15,"г"]]},
+  {name:"1001 ночь", ing:[["Slowmo-Жасмин/рислинг",40,"мл"],["Джин Хаус",40,"мл"],["Ликер Личи",15,"мл"],["Совиньон блан",15,"мл"]]},
+  {name:"Чери Чери Леди (сауэр)", ing:[["Slowmo-Черешня/Жасмин",40,"мл"],["Бурбон Хаус",40,"мл"],["Ликер Ред кюрасао",10,"мл"],["Микс Кислот",10,"мл"],["Белок",10,"мл"]]},
+  {name:"Грушевый кайфун (сауэр)", ing:[["Slowmo-Груша/дуб",40,"мл"],["Вермут Мартини Россо",10,"мл"],["Бурбон Хаус",40,"мл"],["Файербол",15,"мл"],["Белок",10,"мл"]]},
+  {name:"Оранж Марго", ing:[["Slowmo-Блад оранж",40,"мл"],["Текила Хаус",40,"мл"],["Ликер грейпфрут",15,"мл"]]},
+  {name:"Холс Палома", ing:[["Slowmo-Грейпфрут/хмель",40,"мл"],["Текила Хаус",40,"мл"],["Ликер Трипл сек",10,"мл"],["Тоник",100,"мл"]]},
+  {name:"Красный Бархат", ing:[["Шмидт смородина",50,"мл"],["Мартини россо",10,"мл"],["Пюре малина",30,"г"],["Кордиал красная смородина",40,"мл"],["Кордиал лист Лайма",25,"мл"],["Белок",20,"мл"]]},
+  {name:"Маракуйя спритц XL", ing:[["Сироп Маракуйя",40,"мл"],["Сидр Роял",170,"мл"],["Фрукты/цитрусы",20,"г"],["Инфьюзи Маракуйя-Ваниль",80,"мл"],["Вода газированная",50,"мл"]]},
+  {name:"Боцман и кокосы XL", ing:[["Смесь ромов пф МЧ",80,"мл"],["Сироп кокос",30,"мл"],["Сливки 11%",50,"мл"],["Сок ананас",150,"мл"],["Пюре ананас",50,"г"]]},
+  {name:"Девятый вал XL", ing:[["Ром",40,"мл"],["Абсент",15,"мл"],["Ликер персик",20,"мл"],["Сироп манго",20,"мл"],["Сироп гренадин",10,"мл"],["Кислота",15,"мл"],["Сок ананас",75,"мл"]]},
+  {name:"Завтрак на суше XL", ing:[["Смесь ромов пф МЧ",90,"мл"],["Сироп миндаль",25,"мл"],["Сок ананас",100,"мл"],["Смесь кислот",15,"мл"],["Ликер трипл сек",20,"мл"],["Фрукты/цитрусы",15,"г"]]},
+  {name:"Зомби МиЧ XL", ing:[["Ром",80,"мл"],["Сироп миндаль",15,"мл"],["Сироп гренадин",15,"мл"],["Сироп пряный",15,"мл"],["Кислота",30,"мл"],["Сок грейпфрут",130,"мл"]]},
+  {name:"Лонг айленд XL", ing:[["Ром",20,"мл"],["Водка",20,"мл"],["Джин",20,"мл"],["Триплсек",20,"мл"],["Текила",20,"мл"],["Кислота",30,"мл"],["Сахарный сироп",10,"мл"],["Кола",120,"мл"]]},
+  {name:"Полундра ХL", ing:[["Ликер персик",30,"мл"],["Сироп персик",10,"мл"],["Сок ананас",100,"мл"],["Ром Хаус",60,"мл"],["Смесь кислот",20,"мл"],["Фрукты/цитрусы",15,"г"]]},
+  {name:"Текила Любовь XL", ing:[["Текила",60,"мл"],["Кордиал Вердита",50,"мл"],["Сок грейпфрут",20,"мл"],["Сахарный сироп",10,"мл"],["Белок",20,"мл"]]},
+  {name:"Красный Бархат XL", ing:[["Шмидт смородина",50,"мл"],["Мартини россо",10,"мл"],["Пюре малина",30,"г"],["Кордиал красная смородина",40,"мл"],["Кордиал лист Лайма",25,"мл"],["Белок",20,"мл"]]},
+  {name:"Секс на пляже XL", ing:[["Водка",40,"мл"],["Ликер персик",30,"мл"],["Кордиал красная смородина",40,"мл"],["Сок ананас",60,"мл"]]},
+  {name:"Алые паруса", ing:[["Малина шишки (инфьюз)",30,"мл"],["Джин",30,"мл"],["Пюре малина",15,"г"],["Кислота",15,"мл"],["Сироп пряный",15,"мл"],["Белок",20,"мл"]]},
+  {name:"Глинтвейн красный", ing:[["Вино Фиорино Д'Оро 3л",150,"мл"],["Сироп медовый",25,"мл"],["Цитрусы",20,"г"],["Корица",5,"г"],["Гвоздика",1,"г"]]},
+  {name:"Яблочный тодди", ing:[["Бурбон Хаус",40,"мл"],["Кордиал эстрогон яблоко",50,"мл"],["Сок яблоко",50,"мл"]]},
+  {name:"Грог", ing:[["Смесь ромов п/ф",40,"мл"],["Кордиал черешня жасмин",50,"мл"],["Сок вишня",50,"мл"]]},
+  {name:"За деньги Да", ing:[["Ликер Апероль",30,"мл"],["Вино игристое Хаус",100,"мл"],["Пюре малина",30,"г"],["Сироп клубника",10,"мл"],["Вода газированная",30,"мл"]]},
+  {name:"Царица", ing:[["Джин Хаус",30,"мл"],["Игристое вино брют",75,"мл"],["Пюре маракуйя",30,"г"],["Сироп яблоко",20,"мл"],["Вода газированная",30,"мл"]]},
+  {name:"Эпл Спритц", ing:[["Slowmo-Эстрагон/яблоко/алоэ",40,"мл"],["Джин Хаус",20,"мл"],["Вермут экстра драй",40,"мл"],["Ликер яблоко",15,"мл"],["Игристое Хаус",50,"мл"]]}
+];
+
+/* Datalist со всеми уникальными ингредиентами */
+(function fillDatalist() {
+  const set = new Set();
+  TTK_BLOCK5.forEach(c => c.ing.forEach(([n]) => set.add(n)));
+  const dl = document.getElementById('all-ingredients');
+  Array.from(set).sort().forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    dl.appendChild(opt);
+  });
+})();
 
 /* ============================================================
    ВСПОМОГАТЕЛЬНОЕ
@@ -221,39 +263,38 @@ function shuffleArray(arr) {
   return a;
 }
 
-/* Собирает тест: 10 случайных вопросов из каждого блока, варианты перемешаны */
 function buildTest() {
   const all = [];
-  Object.keys(POOLS).forEach(blockKey => {
+  ['block1','block2','block3','block4'].forEach(blockKey => {
     const pool = POOLS[blockKey];
     const picked = shuffleArray(pool).slice(0, QUESTIONS_PER_BLOCK);
-    picked.forEach((q, idx) => {
+    picked.forEach((q) => {
       const indices = q.o.map((_, j) => j);
       const shufIdx = shuffleArray(indices);
       const newO = shufIdx.map(j => q.o[j]);
       const newA = shufIdx.indexOf(q.a);
       all.push({
+        type: 'choice',
         block: blockKey,
         blockName: BLOCK_NAMES[blockKey],
-        blockPos: idx + 1,
-        q: q.q,
-        o: newO,
-        a: newA
+        q: q.q, o: newO, a: newA
       });
+    });
+  });
+  const picked5 = shuffleArray(TTK_BLOCK5).slice(0, QUESTIONS_PER_BLOCK);
+  picked5.forEach(c => {
+    all.push({
+      type: 'ttk',
+      block: 'block5',
+      blockName: BLOCK_NAMES.block5,
+      cocktailName: c.name,
+      ingredients: c.ing
     });
   });
   return all;
 }
 
-/* ============================================================
-   СОСТОЯНИЕ
-   ============================================================ */
-let submitted = false;
-let testStarted = false;
-let secondsLeft = 0;
-let timerInterval = null;
-let TEST_TIME_MIN = 90;
-let userName = '';
+let submitted = false, testStarted = false, secondsLeft = 0, timerInterval = null, TEST_TIME_MIN = 90, userName = '';
 let CURRENT = [];
 
 /* ============================================================
@@ -266,14 +307,29 @@ function render(questions) {
   questions.forEach((q, i) => {
     if (q.block !== lastBlock) {
       const blockNum = ['block1','block2','block3','block4','block5'].indexOf(q.block) + 1;
-      html += `<div class="block-title">${q.blockName}<small>Вопросы ${blockNum}1–${blockNum}0 из 50</small></div>`;
+      const baseNum = (blockNum - 1) * 10 + 1;
+      html += `<div class="block-title">${q.blockName}<small>Вопросы ${baseNum}–${baseNum + 9} из 50</small></div>`;
       lastBlock = q.block;
     }
-    html += `<div class="question" id="q${i}"><h3>${i + 1}. ${q.q}</h3>`;
-    q.o.forEach((opt, j) => {
-      html += `<label class="option" id="q${i}o${j}"><input type="radio" name="q${i}" value="${j}" onchange="updateProgress()"><span>${opt}</span></label>`;
-    });
-    html += `</div>`;
+    if (q.type === 'choice') {
+      html += `<div class="question" id="q${i}"><h3>${i + 1}. ${q.q}</h3>`;
+      q.o.forEach((opt, j) => {
+        html += `<label class="option" id="q${i}o${j}"><input type="radio" name="q${i}" value="${j}" onchange="updateProgress()"><span>${opt}</span></label>`;
+      });
+      html += `</div>`;
+    } else {
+      const n = q.ingredients.length;
+      html += `<div class="question" id="q${i}">
+        <h3>${i + 1}. Коктейль «${q.cocktailName}»</h3>
+        <p class="ttk-hint">Введите <b>все ${n} ингредиентов</b> этого коктейля и их количество (мл/г).</p>`;
+      for (let k = 0; k < n; k++) {
+        html += `<div class="ttk-row">
+          <input type="text" name="ttkIng${i}_${k}" list="all-ingredients" placeholder="Ингредиент…" class="ttk-input ttk-ing" autocomplete="off" oninput="updateProgress()">
+          <input type="text" inputmode="decimal" name="ttkAmt${i}_${k}" placeholder="Кол-во" class="ttk-input ttk-amt" autocomplete="off" oninput="updateProgress()">
+        </div>`;
+      }
+      html += `</div>`;
+    }
   });
   html += `<button class="btn" id="submitBtn" onclick="submit(false)">Сдать тест</button>
            <button class="btn secondary" id="resetBtn" style="display:none" onclick="reset()">Пройти заново</button>`;
@@ -281,7 +337,7 @@ function render(questions) {
 }
 
 /* ============================================================
-   СТАРТ
+   СТАРТ / ТАЙМЕР / ПРОГРЕСС
    ============================================================ */
 function startTest() {
   const name = document.getElementById('userName').value.trim();
@@ -297,10 +353,8 @@ function startTest() {
   document.getElementById('nameBlock').style.display = 'none';
   document.getElementById('progress').style.display = 'block';
   document.getElementById('warning').classList.remove('show');
-
   CURRENT = buildTest();
   render(CURRENT);
-
   document.getElementById('submitBtn').style.display = 'block';
   loadTimerSetting();
 }
@@ -335,12 +389,94 @@ function updateTimerDisplay() {
   else if (secondsLeft <= 300) box.classList.add('warn');
 }
 
+function isAnswered(q, i) {
+  if (q.type === 'choice') {
+    return !!document.querySelector(`input[name="q${i}"]:checked`);
+  } else {
+    const n = q.ingredients.length;
+    let filled = 0;
+    for (let k = 0; k < n; k++) {
+      const ing = document.querySelector(`input[name="ttkIng${i}_${k}"]`);
+      const amt = document.querySelector(`input[name="ttkAmt${i}_${k}"]`);
+      if (ing && amt && ing.value.trim() && amt.value.trim()) filled++;
+    }
+    return filled > 0;
+  }
+}
+
 function updateProgress() {
   if (submitted) return;
   let answered = 0;
-  CURRENT.forEach((q, i) => { if (document.querySelector(`input[name="q${i}"]:checked`)) answered++; });
+  CURRENT.forEach((q, i) => { if (isAnswered(q, i)) answered++; });
   document.getElementById('progress').textContent = `Отвечено: ${answered} из ${CURRENT.length}`;
   document.getElementById('warning').classList.remove('show');
+}
+
+/* ============================================================
+   ПРОВЕРКА БЛОКА 5
+   ============================================================ */
+function norm(s) {
+  return String(s || '').toLowerCase().replace(/ё/g, 'е').replace(/\s+/g, ' ').trim();
+}
+
+function matchIngredient(expected, userInput) {
+  const e = norm(expected);
+  const u = norm(userInput);
+  if (!u) return false;
+  if (e === u) return true;
+  if (u.length >= 4 && e.includes(u)) return true;
+  if (e.length >= 4 && u.includes(e)) return true;
+  return false;
+}
+
+function parseAmt(s) {
+  const v = parseFloat(String(s || '').replace(',', '.'));
+  return isNaN(v) ? null : v;
+}
+
+function matchAmount(expected, userAmt) {
+  const eps = expected < 5 ? 0.1 : 0.5;
+  if (Math.abs(userAmt - expected) < eps) return true;
+  if (Math.abs(userAmt - expected / 1000) < eps) return true;
+  return false;
+}
+
+function checkTtk(q, answers) {
+  const used = new Array(q.ingredients.length).fill(false);
+  const detail = [];
+  let correctCount = 0;
+
+  for (let k = 0; k < answers.length; k++) {
+    const ingNorm = norm(answers[k].ing);
+    const amt = parseAmt(answers[k].amt);
+
+    if (!ingNorm || amt === null) {
+      detail.push({status: 'empty', k});
+      continue;
+    }
+
+    let matched = -1;
+    for (let j = 0; j < q.ingredients.length; j++) {
+      if (used[j]) continue;
+      const [name, expected] = q.ingredients[j];
+      if (matchIngredient(name, ingNorm) && matchAmount(expected, amt)) {
+        matched = j;
+        break;
+      }
+    }
+
+    if (matched >= 0) {
+      used[matched] = true;
+      correctCount++;
+      detail.push({status: 'ok', k, matched});
+    } else {
+      detail.push({status: 'wrong', k});
+    }
+  }
+
+  const allCovered = used.every(Boolean);
+  const ok = allCovered && correctCount === q.ingredients.length;
+  return { ok, correctCount, total: q.ingredients.length, used, detail };
 }
 
 /* ============================================================
@@ -351,7 +487,7 @@ function submit(isAuto) {
 
   if (!isAuto) {
     let unanswered = 0;
-    CURRENT.forEach((q, i) => { if (!document.querySelector(`input[name="q${i}"]:checked`)) unanswered++; });
+    CURRENT.forEach((q, i) => { if (!isAnswered(q, i)) unanswered++; });
     if (unanswered > 0) {
       const w = document.getElementById('warning');
       w.textContent = `Ответьте на все вопросы. Осталось: ${unanswered}.`;
@@ -372,31 +508,59 @@ function submit(isAuto) {
   Object.keys(BLOCK_NAMES).forEach(k => { errorByBlock[k] = []; });
 
   CURRENT.forEach((q, i) => {
-    const qDiv = document.getElementById(`q${i}`);
-    const selected = qDiv.querySelector('input:checked');
-    const userAns = selected ? +selected.value : -1;
-    const isCorrect = userAns === q.a;
-    if (isCorrect) score++;
+    if (q.type === 'choice') {
+      const qDiv = document.getElementById(`q${i}`);
+      const selected = qDiv.querySelector('input:checked');
+      const userAns = selected ? +selected.value : -1;
+      const isCorrect = userAns === q.a;
+      if (isCorrect) score++;
+      if (!isCorrect) {
+        errorByBlock[q.block].push(
+          `№${i + 1}. ${q.q}\n` +
+          `Ответ: ${userAns >= 0 ? q.o[userAns] : '— (нет ответа)'}\n` +
+          `Правильный: ${q.o[q.a]}`
+        );
+      }
+      q.o.forEach((opt, j) => {
+        const optLabel = document.getElementById(`q${i}o${j}`);
+        optLabel.querySelector('input').disabled = true;
+        optLabel.classList.add('locked');
+        if (j === q.a) optLabel.classList.add('correct');
+        if (userAns === j && j !== q.a) optLabel.classList.add('wrong');
+      });
+    } else {
+      const n = q.ingredients.length;
+      const answers = [];
+      for (let k = 0; k < n; k++) {
+        const ing = document.querySelector(`input[name="ttkIng${i}_${k}"]`);
+        const amt = document.querySelector(`input[name="ttkAmt${i}_${k}"]`);
+        answers.push({ ing: ing.value.trim(), amt: amt.value.trim() });
+        ing.disabled = true;
+        amt.disabled = true;
+      }
+      const r = checkTtk(q, answers);
+      if (r.ok) score++;
 
-    if (!isCorrect) {
-      errorByBlock[q.block].push(
-        `№${i + 1}. ${q.q}\n` +
-        `Ответ: ${userAns >= 0 ? q.o[userAns] : '— (нет ответа)'}\n` +
-        `Правильный: ${q.o[q.a]}`
-      );
+      const box = document.createElement('div');
+      const list = q.ingredients.map(([nn, aa, uu]) => `<li>${nn} — <b>${aa} ${uu}</b></li>`).join('');
+      if (r.ok) {
+        box.className = 'ttk-result ok';
+        box.innerHTML = `✅ Верно — ${r.correctCount} из ${r.total} ингредиентов.`;
+      } else {
+        box.className = 'ttk-result bad';
+        box.innerHTML = `❌ Верно ${r.correctCount} из ${r.total}. Правильные ингредиенты:<ul>${list}</ul>`;
+        errorByBlock[q.block].push(
+          `№${i + 1}. Коктейль «${q.cocktailName}»\n` +
+          `Верно ${r.correctCount} из ${r.total}\n` +
+          `Правильные:\n` +
+          q.ingredients.map(([nn, aa, uu]) => `- ${nn} — ${aa} ${uu}`).join('\n')
+        );
+      }
+      document.getElementById(`q${i}`).appendChild(box);
     }
-
-    q.o.forEach((opt, j) => {
-      const optLabel = document.getElementById(`q${i}o${j}`);
-      optLabel.querySelector('input').disabled = true;
-      optLabel.classList.add('locked');
-      if (j === q.a) optLabel.classList.add('correct');
-      if (userAns === j && j !== q.a) optLabel.classList.add('wrong');
-    });
   });
   submitted = true;
 
-  // Собираем details с группировкой по блокам
   const details = [];
   Object.keys(BLOCK_NAMES).forEach(k => {
     const errs = errorByBlock[k];
@@ -404,9 +568,7 @@ function submit(isAuto) {
       details.push(`━━━ ${BLOCK_NAMES[k]} ━━━\n` + errs.join('\n\n'));
     }
   });
-  if (details.length === 0) {
-    details.push('✅ Все ответы верные — ошибок нет.');
-  }
+  if (details.length === 0) details.push('✅ Все ответы верные — ошибок нет.');
 
   const total = CURRENT.length;
   const pct = Math.round((score / total) * 100);
@@ -441,7 +603,7 @@ function submit(isAuto) {
 }
 
 /* ============================================================
-   СБРОС
+   СБРОС / УТИЛИТЫ
    ============================================================ */
 function reset() {
   submitted = false; testStarted = false;
@@ -458,9 +620,6 @@ function reset() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* ============================================================
-   УТИЛИТЫ
-   ============================================================ */
 function jsonp(url, callback) {
   const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   window[cbName] = (data) => {
